@@ -1,0 +1,1269 @@
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"keyboard_keyboard.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.keyboard_Test,"ax",%progbits
+  20              		.align	2
+  21              		.global	keyboard_Test
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	keyboard_Test, %function
+  25              	keyboard_Test:
+  26              	.LFB0:
+  27              		.file 1 "Generated_Source\\PSoC5\\keyboard_keyboard.c"
+   1:Generated_Source\PSoC5/keyboard_keyboard.c **** /* ========================================
+   2:Generated_Source\PSoC5/keyboard_keyboard.c ****  *
+   3:Generated_Source\PSoC5/keyboard_keyboard.c ****  * Copyright YOUR COMPANY, THE YEAR
+   4:Generated_Source\PSoC5/keyboard_keyboard.c ****  * All Rights Reserved
+   5:Generated_Source\PSoC5/keyboard_keyboard.c ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:Generated_Source\PSoC5/keyboard_keyboard.c ****  *
+   7:Generated_Source\PSoC5/keyboard_keyboard.c ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:Generated_Source\PSoC5/keyboard_keyboard.c ****  * WHICH IS THE PROPERTY OF your company.
+   9:Generated_Source\PSoC5/keyboard_keyboard.c ****  *
+  10:Generated_Source\PSoC5/keyboard_keyboard.c ****  * ========================================
+  11:Generated_Source\PSoC5/keyboard_keyboard.c **** */
+  12:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  13:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "CyLib.h"
+  14:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  15:Generated_Source\PSoC5/keyboard_keyboard.c **** //#include "keyboard_KeyboardPort.h"
+  16:Generated_Source\PSoC5/keyboard_keyboard.c **** //#include "keyboard_KeyboardCol0.h"
+  17:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardCol1.h"
+  18:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardCol2.h"
+  19:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardCol3.h"
+  20:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  21:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardRow0.h"
+  22:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardRow1.h"
+  23:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardRow2.h"
+  24:Generated_Source\PSoC5/keyboard_keyboard.c **** #include "keyboard_KeyboardRow3.h"
+  25:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  26:Generated_Source\PSoC5/keyboard_keyboard.c **** //#define LED_Write keyboard_KeyboardPort_Write
+  27:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  28:Generated_Source\PSoC5/keyboard_keyboard.c **** //#define COL0_Write keyboard_KeyboardCol0_Write
+  29:Generated_Source\PSoC5/keyboard_keyboard.c **** #define COL1_Write keyboard_KeyboardCol1_Write
+  30:Generated_Source\PSoC5/keyboard_keyboard.c **** #define COL2_Write keyboard_KeyboardCol2_Write
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 2
+
+
+  31:Generated_Source\PSoC5/keyboard_keyboard.c **** #define COL3_Write keyboard_KeyboardCol3_Write
+  32:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  33:Generated_Source\PSoC5/keyboard_keyboard.c **** #define ROW0_Read keyboard_KeyboardRow0_Read
+  34:Generated_Source\PSoC5/keyboard_keyboard.c **** #define ROW1_Read keyboard_KeyboardRow1_Read
+  35:Generated_Source\PSoC5/keyboard_keyboard.c **** #define ROW2_Read keyboard_KeyboardRow2_Read
+  36:Generated_Source\PSoC5/keyboard_keyboard.c **** #define ROW3_Read keyboard_KeyboardRow3_Read
+  37:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  38:Generated_Source\PSoC5/keyboard_keyboard.c **** #define KBD_DELAY   5
+  39:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  40:Generated_Source\PSoC5/keyboard_keyboard.c **** void keyboard_Test(void){
+  28              		.loc 1 40 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33 0000 7047     		bx	lr
+  34              		.cfi_endproc
+  35              	.LFE0:
+  36              		.size	keyboard_Test, .-keyboard_Test
+  37 0002 00BF     		.section	.text.keyboard_Start,"ax",%progbits
+  38              		.align	2
+  39              		.global	keyboard_Start
+  40              		.thumb
+  41              		.thumb_func
+  42              		.type	keyboard_Start, %function
+  43              	keyboard_Start:
+  44              	.LFB1:
+  41:Generated_Source\PSoC5/keyboard_keyboard.c ****     //LED_Write(1);
+  42:Generated_Source\PSoC5/keyboard_keyboard.c ****     //Kb_KeaboardPort_Write(1);
+  43:Generated_Source\PSoC5/keyboard_keyboard.c **** }
+  44:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  45:Generated_Source\PSoC5/keyboard_keyboard.c **** void keyboard_Start(void){
+  45              		.loc 1 45 0
+  46              		.cfi_startproc
+  47              		@ args = 0, pretend = 0, frame = 0
+  48              		@ frame_needed = 0, uses_anonymous_args = 0
+  49              		.loc 1 45 0
+  50 0000 08B5     		push	{r3, lr}
+  51              		.cfi_def_cfa_offset 8
+  52              		.cfi_offset 3, -8
+  53              		.cfi_offset 14, -4
+  46:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL1_Write(1);
+  54              		.loc 1 46 0
+  55 0002 0120     		movs	r0, #1
+  56 0004 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+  57              	.LVL0:
+  47:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL2_Write(1);
+  58              		.loc 1 47 0
+  59 0008 0120     		movs	r0, #1
+  60 000a FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+  61              	.LVL1:
+  48:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL3_Write(1);
+  62              		.loc 1 48 0
+  63 000e 0120     		movs	r0, #1
+  64 0010 FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+  65              	.LVL2:
+  66 0014 08BD     		pop	{r3, pc}
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 3
+
+
+  67              		.cfi_endproc
+  68              	.LFE1:
+  69              		.size	keyboard_Start, .-keyboard_Start
+  70 0016 00BF     		.section	.text.keyboard_Scan,"ax",%progbits
+  71              		.align	2
+  72              		.global	keyboard_Scan
+  73              		.thumb
+  74              		.thumb_func
+  75              		.type	keyboard_Scan, %function
+  76              	keyboard_Scan:
+  77              	.LFB2:
+  49:Generated_Source\PSoC5/keyboard_keyboard.c **** }
+  50:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  51:Generated_Source\PSoC5/keyboard_keyboard.c **** uint8_t keyboard_Scan(void){
+  78              		.loc 1 51 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82 0000 08B5     		push	{r3, lr}
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 3, -8
+  85              		.cfi_offset 14, -4
+  52:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL1_Write(0);
+  86              		.loc 1 52 0
+  87 0002 0020     		movs	r0, #0
+  88 0004 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+  89              	.LVL3:
+  53:Generated_Source\PSoC5/keyboard_keyboard.c ****     CyDelay(KBD_DELAY);
+  90              		.loc 1 53 0
+  91 0008 0520     		movs	r0, #5
+  92 000a FFF7FEFF 		bl	CyDelay
+  93              	.LVL4:
+  54:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW0_Read()) {
+  94              		.loc 1 54 0
+  95 000e FFF7FEFF 		bl	keyboard_KeyboardRow0_Read
+  96              	.LVL5:
+  97 0012 20B9     		cbnz	r0, .L5
+  55:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL1_Write(1);
+  98              		.loc 1 55 0
+  99 0014 0120     		movs	r0, #1
+ 100 0016 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+ 101              	.LVL6:
+  56:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('#');
+ 102              		.loc 1 56 0
+ 103 001a 2320     		movs	r0, #35
+ 104 001c 08BD     		pop	{r3, pc}
+ 105              	.L5:
+  57:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  58:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW1_Read()) {
+ 106              		.loc 1 58 0
+ 107 001e FFF7FEFF 		bl	keyboard_KeyboardRow1_Read
+ 108              	.LVL7:
+ 109 0022 20B9     		cbnz	r0, .L7
+  59:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL1_Write(1);
+ 110              		.loc 1 59 0
+ 111 0024 0120     		movs	r0, #1
+ 112 0026 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 4
+
+
+ 113              	.LVL8:
+  60:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('9');
+ 114              		.loc 1 60 0
+ 115 002a 3920     		movs	r0, #57
+ 116 002c 08BD     		pop	{r3, pc}
+ 117              	.L7:
+  61:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  62:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW2_Read()) {
+ 118              		.loc 1 62 0
+ 119 002e FFF7FEFF 		bl	keyboard_KeyboardRow2_Read
+ 120              	.LVL9:
+ 121 0032 20B9     		cbnz	r0, .L8
+  63:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL1_Write(1);
+ 122              		.loc 1 63 0
+ 123 0034 0120     		movs	r0, #1
+ 124 0036 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+ 125              	.LVL10:
+  64:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('6');
+ 126              		.loc 1 64 0
+ 127 003a 3620     		movs	r0, #54
+ 128 003c 08BD     		pop	{r3, pc}
+ 129              	.L8:
+  65:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  66:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW3_Read()) {
+ 130              		.loc 1 66 0
+ 131 003e FFF7FEFF 		bl	keyboard_KeyboardRow3_Read
+ 132              	.LVL11:
+ 133 0042 20B9     		cbnz	r0, .L9
+  67:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL1_Write(1);
+ 134              		.loc 1 67 0
+ 135 0044 0120     		movs	r0, #1
+ 136 0046 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+ 137              	.LVL12:
+  68:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('3');
+ 138              		.loc 1 68 0
+ 139 004a 3320     		movs	r0, #51
+ 140 004c 08BD     		pop	{r3, pc}
+ 141              	.L9:
+  69:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  70:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL1_Write(1);
+ 142              		.loc 1 70 0
+ 143 004e 0120     		movs	r0, #1
+ 144 0050 FFF7FEFF 		bl	keyboard_KeyboardCol1_Write
+ 145              	.LVL13:
+  71:Generated_Source\PSoC5/keyboard_keyboard.c ****     
+  72:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL2_Write(0);
+ 146              		.loc 1 72 0
+ 147 0054 0020     		movs	r0, #0
+ 148 0056 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 149              	.LVL14:
+  73:Generated_Source\PSoC5/keyboard_keyboard.c ****     CyDelay(KBD_DELAY);
+ 150              		.loc 1 73 0
+ 151 005a 0520     		movs	r0, #5
+ 152 005c FFF7FEFF 		bl	CyDelay
+ 153              	.LVL15:
+  74:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW0_Read()) {
+ 154              		.loc 1 74 0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 5
+
+
+ 155 0060 FFF7FEFF 		bl	keyboard_KeyboardRow0_Read
+ 156              	.LVL16:
+ 157 0064 20B9     		cbnz	r0, .L10
+  75:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL2_Write(1);
+ 158              		.loc 1 75 0
+ 159 0066 0120     		movs	r0, #1
+ 160 0068 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 161              	.LVL17:
+  76:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('0');
+ 162              		.loc 1 76 0
+ 163 006c 3020     		movs	r0, #48
+ 164 006e 08BD     		pop	{r3, pc}
+ 165              	.L10:
+  77:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  78:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW1_Read()) {
+ 166              		.loc 1 78 0
+ 167 0070 FFF7FEFF 		bl	keyboard_KeyboardRow1_Read
+ 168              	.LVL18:
+ 169 0074 20B9     		cbnz	r0, .L11
+  79:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL2_Write(1);
+ 170              		.loc 1 79 0
+ 171 0076 0120     		movs	r0, #1
+ 172 0078 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 173              	.LVL19:
+  80:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('8');
+ 174              		.loc 1 80 0
+ 175 007c 3820     		movs	r0, #56
+ 176 007e 08BD     		pop	{r3, pc}
+ 177              	.L11:
+  81:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  82:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW2_Read()) {
+ 178              		.loc 1 82 0
+ 179 0080 FFF7FEFF 		bl	keyboard_KeyboardRow2_Read
+ 180              	.LVL20:
+ 181 0084 20B9     		cbnz	r0, .L12
+  83:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL2_Write(1);
+ 182              		.loc 1 83 0
+ 183 0086 0120     		movs	r0, #1
+ 184 0088 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 185              	.LVL21:
+  84:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('5');
+ 186              		.loc 1 84 0
+ 187 008c 3520     		movs	r0, #53
+ 188 008e 08BD     		pop	{r3, pc}
+ 189              	.L12:
+  85:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  86:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW3_Read()) {
+ 190              		.loc 1 86 0
+ 191 0090 FFF7FEFF 		bl	keyboard_KeyboardRow3_Read
+ 192              	.LVL22:
+ 193 0094 20B9     		cbnz	r0, .L13
+  87:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL2_Write(1);
+ 194              		.loc 1 87 0
+ 195 0096 0120     		movs	r0, #1
+ 196 0098 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 197              	.LVL23:
+  88:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('2');
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 6
+
+
+ 198              		.loc 1 88 0
+ 199 009c 3220     		movs	r0, #50
+ 200 009e 08BD     		pop	{r3, pc}
+ 201              	.L13:
+  89:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  90:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL2_Write(1);
+ 202              		.loc 1 90 0
+ 203 00a0 0120     		movs	r0, #1
+ 204 00a2 FFF7FEFF 		bl	keyboard_KeyboardCol2_Write
+ 205              	.LVL24:
+  91:Generated_Source\PSoC5/keyboard_keyboard.c **** 
+  92:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL3_Write(0);
+ 206              		.loc 1 92 0
+ 207 00a6 0020     		movs	r0, #0
+ 208 00a8 FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 209              	.LVL25:
+  93:Generated_Source\PSoC5/keyboard_keyboard.c ****     CyDelay(KBD_DELAY);
+ 210              		.loc 1 93 0
+ 211 00ac 0520     		movs	r0, #5
+ 212 00ae FFF7FEFF 		bl	CyDelay
+ 213              	.LVL26:
+  94:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW0_Read()) {
+ 214              		.loc 1 94 0
+ 215 00b2 FFF7FEFF 		bl	keyboard_KeyboardRow0_Read
+ 216              	.LVL27:
+ 217 00b6 20B9     		cbnz	r0, .L14
+  95:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL3_Write(1);
+ 218              		.loc 1 95 0
+ 219 00b8 0120     		movs	r0, #1
+ 220 00ba FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 221              	.LVL28:
+  96:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('*');
+ 222              		.loc 1 96 0
+ 223 00be 2A20     		movs	r0, #42
+ 224 00c0 08BD     		pop	{r3, pc}
+ 225              	.L14:
+  97:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+  98:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW1_Read()) {
+ 226              		.loc 1 98 0
+ 227 00c2 FFF7FEFF 		bl	keyboard_KeyboardRow1_Read
+ 228              	.LVL29:
+ 229 00c6 20B9     		cbnz	r0, .L15
+  99:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL3_Write(1);
+ 230              		.loc 1 99 0
+ 231 00c8 0120     		movs	r0, #1
+ 232 00ca FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 233              	.LVL30:
+ 100:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('7');
+ 234              		.loc 1 100 0
+ 235 00ce 3720     		movs	r0, #55
+ 236 00d0 08BD     		pop	{r3, pc}
+ 237              	.L15:
+ 101:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+ 102:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW2_Read()) {
+ 238              		.loc 1 102 0
+ 239 00d2 FFF7FEFF 		bl	keyboard_KeyboardRow2_Read
+ 240              	.LVL31:
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 7
+
+
+ 241 00d6 20B9     		cbnz	r0, .L16
+ 103:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL3_Write(1);
+ 242              		.loc 1 103 0
+ 243 00d8 0120     		movs	r0, #1
+ 244 00da FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 245              	.LVL32:
+ 104:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('4');
+ 246              		.loc 1 104 0
+ 247 00de 3420     		movs	r0, #52
+ 248 00e0 08BD     		pop	{r3, pc}
+ 249              	.L16:
+ 105:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+ 106:Generated_Source\PSoC5/keyboard_keyboard.c ****     if (!ROW3_Read()) {
+ 250              		.loc 1 106 0
+ 251 00e2 FFF7FEFF 		bl	keyboard_KeyboardRow3_Read
+ 252              	.LVL33:
+ 253 00e6 20B9     		cbnz	r0, .L17
+ 107:Generated_Source\PSoC5/keyboard_keyboard.c ****         COL3_Write(1);
+ 254              		.loc 1 107 0
+ 255 00e8 0120     		movs	r0, #1
+ 256 00ea FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 257              	.LVL34:
+ 108:Generated_Source\PSoC5/keyboard_keyboard.c ****         return('1');
+ 258              		.loc 1 108 0
+ 259 00ee 3120     		movs	r0, #49
+ 260 00f0 08BD     		pop	{r3, pc}
+ 261              	.L17:
+ 109:Generated_Source\PSoC5/keyboard_keyboard.c ****     }
+ 110:Generated_Source\PSoC5/keyboard_keyboard.c ****     COL3_Write(1);
+ 262              		.loc 1 110 0
+ 263 00f2 0120     		movs	r0, #1
+ 264 00f4 FFF7FEFF 		bl	keyboard_KeyboardCol3_Write
+ 265              	.LVL35:
+ 111:Generated_Source\PSoC5/keyboard_keyboard.c ****     
+ 112:Generated_Source\PSoC5/keyboard_keyboard.c ****     return('z');
+ 266              		.loc 1 112 0
+ 267 00f8 7A20     		movs	r0, #122
+ 113:Generated_Source\PSoC5/keyboard_keyboard.c **** }
+ 268              		.loc 1 113 0
+ 269 00fa 08BD     		pop	{r3, pc}
+ 270              		.cfi_endproc
+ 271              	.LFE2:
+ 272              		.size	keyboard_Scan, .-keyboard_Scan
+ 273              		.text
+ 274              	.Letext0:
+ 275              		.file 2 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 276              		.file 3 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 277              		.file 4 "Generated_Source\\PSoC5\\keyboard_KeyboardCol1.h"
+ 278              		.file 5 "Generated_Source\\PSoC5\\keyboard_KeyboardCol2.h"
+ 279              		.file 6 "Generated_Source\\PSoC5\\keyboard_KeyboardCol3.h"
+ 280              		.file 7 "Generated_Source\\PSoC5\\CyLib.h"
+ 281              		.file 8 "Generated_Source\\PSoC5\\keyboard_KeyboardRow0.h"
+ 282              		.file 9 "Generated_Source\\PSoC5\\keyboard_KeyboardRow1.h"
+ 283              		.file 10 "Generated_Source\\PSoC5\\keyboard_KeyboardRow2.h"
+ 284              		.file 11 "Generated_Source\\PSoC5\\keyboard_KeyboardRow3.h"
+ 285              		.section	.debug_info,"",%progbits
+ 286              	.Ldebug_info0:
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 8
+
+
+ 287 0000 66030000 		.4byte	0x366
+ 288 0004 0400     		.2byte	0x4
+ 289 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 290 000a 04       		.byte	0x4
+ 291 000b 01       		.uleb128 0x1
+ 292 000c 80000000 		.4byte	.LASF24
+ 293 0010 0C       		.byte	0xc
+ 294 0011 69010000 		.4byte	.LASF25
+ 295 0015 0D020000 		.4byte	.LASF26
+ 296 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 297 001d 00000000 		.4byte	0
+ 298 0021 00000000 		.4byte	.Ldebug_line0
+ 299 0025 02       		.uleb128 0x2
+ 300 0026 04       		.byte	0x4
+ 301 0027 05       		.byte	0x5
+ 302 0028 696E7400 		.ascii	"int\000"
+ 303 002c 03       		.uleb128 0x3
+ 304 002d 04       		.byte	0x4
+ 305 002e 07       		.byte	0x7
+ 306 002f C5010000 		.4byte	.LASF0
+ 307 0033 03       		.uleb128 0x3
+ 308 0034 08       		.byte	0x8
+ 309 0035 05       		.byte	0x5
+ 310 0036 FA010000 		.4byte	.LASF1
+ 311 003a 03       		.uleb128 0x3
+ 312 003b 08       		.byte	0x8
+ 313 003c 04       		.byte	0x4
+ 314 003d 5C020000 		.4byte	.LASF2
+ 315 0041 03       		.uleb128 0x3
+ 316 0042 01       		.byte	0x1
+ 317 0043 06       		.byte	0x6
+ 318 0044 68020000 		.4byte	.LASF3
+ 319 0048 04       		.uleb128 0x4
+ 320 0049 00000000 		.4byte	.LASF12
+ 321 004d 02       		.byte	0x2
+ 322 004e 1D       		.byte	0x1d
+ 323 004f 53000000 		.4byte	0x53
+ 324 0053 03       		.uleb128 0x3
+ 325 0054 01       		.byte	0x1
+ 326 0055 08       		.byte	0x8
+ 327 0056 72000000 		.4byte	.LASF4
+ 328 005a 03       		.uleb128 0x3
+ 329 005b 02       		.byte	0x2
+ 330 005c 05       		.byte	0x5
+ 331 005d 3B020000 		.4byte	.LASF5
+ 332 0061 03       		.uleb128 0x3
+ 333 0062 02       		.byte	0x2
+ 334 0063 07       		.byte	0x7
+ 335 0064 56010000 		.4byte	.LASF6
+ 336 0068 03       		.uleb128 0x3
+ 337 0069 04       		.byte	0x4
+ 338 006a 05       		.byte	0x5
+ 339 006b 53020000 		.4byte	.LASF7
+ 340 006f 03       		.uleb128 0x3
+ 341 0070 04       		.byte	0x4
+ 342 0071 07       		.byte	0x7
+ 343 0072 29010000 		.4byte	.LASF8
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 9
+
+
+ 344 0076 03       		.uleb128 0x3
+ 345 0077 08       		.byte	0x8
+ 346 0078 07       		.byte	0x7
+ 347 0079 D2010000 		.4byte	.LASF9
+ 348 007d 03       		.uleb128 0x3
+ 349 007e 04       		.byte	0x4
+ 350 007f 07       		.byte	0x7
+ 351 0080 F1010000 		.4byte	.LASF10
+ 352 0084 03       		.uleb128 0x3
+ 353 0085 01       		.byte	0x1
+ 354 0086 08       		.byte	0x8
+ 355 0087 08020000 		.4byte	.LASF11
+ 356 008b 04       		.uleb128 0x4
+ 357 008c E9010000 		.4byte	.LASF13
+ 358 0090 03       		.byte	0x3
+ 359 0091 18       		.byte	0x18
+ 360 0092 48000000 		.4byte	0x48
+ 361 0096 03       		.uleb128 0x3
+ 362 0097 04       		.byte	0x4
+ 363 0098 04       		.byte	0x4
+ 364 0099 41000000 		.4byte	.LASF14
+ 365 009d 03       		.uleb128 0x3
+ 366 009e 08       		.byte	0x8
+ 367 009f 04       		.byte	0x4
+ 368 00a0 BE010000 		.4byte	.LASF15
+ 369 00a4 05       		.uleb128 0x5
+ 370 00a5 45020000 		.4byte	.LASF27
+ 371 00a9 01       		.byte	0x1
+ 372 00aa 28       		.byte	0x28
+ 373 00ab 00000000 		.4byte	.LFB0
+ 374 00af 02000000 		.4byte	.LFE0-.LFB0
+ 375 00b3 01       		.uleb128 0x1
+ 376 00b4 9C       		.byte	0x9c
+ 377 00b5 06       		.uleb128 0x6
+ 378 00b6 47000000 		.4byte	.LASF28
+ 379 00ba 01       		.byte	0x1
+ 380 00bb 2D       		.byte	0x2d
+ 381 00bc 00000000 		.4byte	.LFB1
+ 382 00c0 16000000 		.4byte	.LFE1-.LFB1
+ 383 00c4 01       		.uleb128 0x1
+ 384 00c5 9C       		.byte	0x9c
+ 385 00c6 00010000 		.4byte	0x100
+ 386 00ca 07       		.uleb128 0x7
+ 387 00cb 08000000 		.4byte	.LVL0
+ 388 00cf 11030000 		.4byte	0x311
+ 389 00d3 DD000000 		.4byte	0xdd
+ 390 00d7 08       		.uleb128 0x8
+ 391 00d8 01       		.uleb128 0x1
+ 392 00d9 50       		.byte	0x50
+ 393 00da 01       		.uleb128 0x1
+ 394 00db 31       		.byte	0x31
+ 395 00dc 00       		.byte	0
+ 396 00dd 07       		.uleb128 0x7
+ 397 00de 0E000000 		.4byte	.LVL1
+ 398 00e2 1C030000 		.4byte	0x31c
+ 399 00e6 F0000000 		.4byte	0xf0
+ 400 00ea 08       		.uleb128 0x8
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 10
+
+
+ 401 00eb 01       		.uleb128 0x1
+ 402 00ec 50       		.byte	0x50
+ 403 00ed 01       		.uleb128 0x1
+ 404 00ee 31       		.byte	0x31
+ 405 00ef 00       		.byte	0
+ 406 00f0 09       		.uleb128 0x9
+ 407 00f1 14000000 		.4byte	.LVL2
+ 408 00f5 27030000 		.4byte	0x327
+ 409 00f9 08       		.uleb128 0x8
+ 410 00fa 01       		.uleb128 0x1
+ 411 00fb 50       		.byte	0x50
+ 412 00fc 01       		.uleb128 0x1
+ 413 00fd 31       		.byte	0x31
+ 414 00fe 00       		.byte	0
+ 415 00ff 00       		.byte	0
+ 416 0100 0A       		.uleb128 0xa
+ 417 0101 B0010000 		.4byte	.LASF29
+ 418 0105 01       		.byte	0x1
+ 419 0106 33       		.byte	0x33
+ 420 0107 8B000000 		.4byte	0x8b
+ 421 010b 00000000 		.4byte	.LFB2
+ 422 010f FC000000 		.4byte	.LFE2-.LFB2
+ 423 0113 01       		.uleb128 0x1
+ 424 0114 9C       		.byte	0x9c
+ 425 0115 11030000 		.4byte	0x311
+ 426 0119 07       		.uleb128 0x7
+ 427 011a 08000000 		.4byte	.LVL3
+ 428 011e 11030000 		.4byte	0x311
+ 429 0122 2C010000 		.4byte	0x12c
+ 430 0126 08       		.uleb128 0x8
+ 431 0127 01       		.uleb128 0x1
+ 432 0128 50       		.byte	0x50
+ 433 0129 01       		.uleb128 0x1
+ 434 012a 30       		.byte	0x30
+ 435 012b 00       		.byte	0
+ 436 012c 07       		.uleb128 0x7
+ 437 012d 0E000000 		.4byte	.LVL4
+ 438 0131 32030000 		.4byte	0x332
+ 439 0135 3F010000 		.4byte	0x13f
+ 440 0139 08       		.uleb128 0x8
+ 441 013a 01       		.uleb128 0x1
+ 442 013b 50       		.byte	0x50
+ 443 013c 01       		.uleb128 0x1
+ 444 013d 35       		.byte	0x35
+ 445 013e 00       		.byte	0
+ 446 013f 0B       		.uleb128 0xb
+ 447 0140 12000000 		.4byte	.LVL5
+ 448 0144 3D030000 		.4byte	0x33d
+ 449 0148 07       		.uleb128 0x7
+ 450 0149 1A000000 		.4byte	.LVL6
+ 451 014d 11030000 		.4byte	0x311
+ 452 0151 5B010000 		.4byte	0x15b
+ 453 0155 08       		.uleb128 0x8
+ 454 0156 01       		.uleb128 0x1
+ 455 0157 50       		.byte	0x50
+ 456 0158 01       		.uleb128 0x1
+ 457 0159 31       		.byte	0x31
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 11
+
+
+ 458 015a 00       		.byte	0
+ 459 015b 0B       		.uleb128 0xb
+ 460 015c 22000000 		.4byte	.LVL7
+ 461 0160 48030000 		.4byte	0x348
+ 462 0164 07       		.uleb128 0x7
+ 463 0165 2A000000 		.4byte	.LVL8
+ 464 0169 11030000 		.4byte	0x311
+ 465 016d 77010000 		.4byte	0x177
+ 466 0171 08       		.uleb128 0x8
+ 467 0172 01       		.uleb128 0x1
+ 468 0173 50       		.byte	0x50
+ 469 0174 01       		.uleb128 0x1
+ 470 0175 31       		.byte	0x31
+ 471 0176 00       		.byte	0
+ 472 0177 0B       		.uleb128 0xb
+ 473 0178 32000000 		.4byte	.LVL9
+ 474 017c 53030000 		.4byte	0x353
+ 475 0180 07       		.uleb128 0x7
+ 476 0181 3A000000 		.4byte	.LVL10
+ 477 0185 11030000 		.4byte	0x311
+ 478 0189 93010000 		.4byte	0x193
+ 479 018d 08       		.uleb128 0x8
+ 480 018e 01       		.uleb128 0x1
+ 481 018f 50       		.byte	0x50
+ 482 0190 01       		.uleb128 0x1
+ 483 0191 31       		.byte	0x31
+ 484 0192 00       		.byte	0
+ 485 0193 0B       		.uleb128 0xb
+ 486 0194 42000000 		.4byte	.LVL11
+ 487 0198 5E030000 		.4byte	0x35e
+ 488 019c 07       		.uleb128 0x7
+ 489 019d 4A000000 		.4byte	.LVL12
+ 490 01a1 11030000 		.4byte	0x311
+ 491 01a5 AF010000 		.4byte	0x1af
+ 492 01a9 08       		.uleb128 0x8
+ 493 01aa 01       		.uleb128 0x1
+ 494 01ab 50       		.byte	0x50
+ 495 01ac 01       		.uleb128 0x1
+ 496 01ad 31       		.byte	0x31
+ 497 01ae 00       		.byte	0
+ 498 01af 07       		.uleb128 0x7
+ 499 01b0 54000000 		.4byte	.LVL13
+ 500 01b4 11030000 		.4byte	0x311
+ 501 01b8 C2010000 		.4byte	0x1c2
+ 502 01bc 08       		.uleb128 0x8
+ 503 01bd 01       		.uleb128 0x1
+ 504 01be 50       		.byte	0x50
+ 505 01bf 01       		.uleb128 0x1
+ 506 01c0 31       		.byte	0x31
+ 507 01c1 00       		.byte	0
+ 508 01c2 07       		.uleb128 0x7
+ 509 01c3 5A000000 		.4byte	.LVL14
+ 510 01c7 1C030000 		.4byte	0x31c
+ 511 01cb D5010000 		.4byte	0x1d5
+ 512 01cf 08       		.uleb128 0x8
+ 513 01d0 01       		.uleb128 0x1
+ 514 01d1 50       		.byte	0x50
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 12
+
+
+ 515 01d2 01       		.uleb128 0x1
+ 516 01d3 30       		.byte	0x30
+ 517 01d4 00       		.byte	0
+ 518 01d5 07       		.uleb128 0x7
+ 519 01d6 60000000 		.4byte	.LVL15
+ 520 01da 32030000 		.4byte	0x332
+ 521 01de E8010000 		.4byte	0x1e8
+ 522 01e2 08       		.uleb128 0x8
+ 523 01e3 01       		.uleb128 0x1
+ 524 01e4 50       		.byte	0x50
+ 525 01e5 01       		.uleb128 0x1
+ 526 01e6 35       		.byte	0x35
+ 527 01e7 00       		.byte	0
+ 528 01e8 0B       		.uleb128 0xb
+ 529 01e9 64000000 		.4byte	.LVL16
+ 530 01ed 3D030000 		.4byte	0x33d
+ 531 01f1 07       		.uleb128 0x7
+ 532 01f2 6C000000 		.4byte	.LVL17
+ 533 01f6 1C030000 		.4byte	0x31c
+ 534 01fa 04020000 		.4byte	0x204
+ 535 01fe 08       		.uleb128 0x8
+ 536 01ff 01       		.uleb128 0x1
+ 537 0200 50       		.byte	0x50
+ 538 0201 01       		.uleb128 0x1
+ 539 0202 31       		.byte	0x31
+ 540 0203 00       		.byte	0
+ 541 0204 0B       		.uleb128 0xb
+ 542 0205 74000000 		.4byte	.LVL18
+ 543 0209 48030000 		.4byte	0x348
+ 544 020d 07       		.uleb128 0x7
+ 545 020e 7C000000 		.4byte	.LVL19
+ 546 0212 1C030000 		.4byte	0x31c
+ 547 0216 20020000 		.4byte	0x220
+ 548 021a 08       		.uleb128 0x8
+ 549 021b 01       		.uleb128 0x1
+ 550 021c 50       		.byte	0x50
+ 551 021d 01       		.uleb128 0x1
+ 552 021e 31       		.byte	0x31
+ 553 021f 00       		.byte	0
+ 554 0220 0B       		.uleb128 0xb
+ 555 0221 84000000 		.4byte	.LVL20
+ 556 0225 53030000 		.4byte	0x353
+ 557 0229 07       		.uleb128 0x7
+ 558 022a 8C000000 		.4byte	.LVL21
+ 559 022e 1C030000 		.4byte	0x31c
+ 560 0232 3C020000 		.4byte	0x23c
+ 561 0236 08       		.uleb128 0x8
+ 562 0237 01       		.uleb128 0x1
+ 563 0238 50       		.byte	0x50
+ 564 0239 01       		.uleb128 0x1
+ 565 023a 31       		.byte	0x31
+ 566 023b 00       		.byte	0
+ 567 023c 0B       		.uleb128 0xb
+ 568 023d 94000000 		.4byte	.LVL22
+ 569 0241 5E030000 		.4byte	0x35e
+ 570 0245 07       		.uleb128 0x7
+ 571 0246 9C000000 		.4byte	.LVL23
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 13
+
+
+ 572 024a 1C030000 		.4byte	0x31c
+ 573 024e 58020000 		.4byte	0x258
+ 574 0252 08       		.uleb128 0x8
+ 575 0253 01       		.uleb128 0x1
+ 576 0254 50       		.byte	0x50
+ 577 0255 01       		.uleb128 0x1
+ 578 0256 31       		.byte	0x31
+ 579 0257 00       		.byte	0
+ 580 0258 07       		.uleb128 0x7
+ 581 0259 A6000000 		.4byte	.LVL24
+ 582 025d 1C030000 		.4byte	0x31c
+ 583 0261 6B020000 		.4byte	0x26b
+ 584 0265 08       		.uleb128 0x8
+ 585 0266 01       		.uleb128 0x1
+ 586 0267 50       		.byte	0x50
+ 587 0268 01       		.uleb128 0x1
+ 588 0269 31       		.byte	0x31
+ 589 026a 00       		.byte	0
+ 590 026b 07       		.uleb128 0x7
+ 591 026c AC000000 		.4byte	.LVL25
+ 592 0270 27030000 		.4byte	0x327
+ 593 0274 7E020000 		.4byte	0x27e
+ 594 0278 08       		.uleb128 0x8
+ 595 0279 01       		.uleb128 0x1
+ 596 027a 50       		.byte	0x50
+ 597 027b 01       		.uleb128 0x1
+ 598 027c 30       		.byte	0x30
+ 599 027d 00       		.byte	0
+ 600 027e 07       		.uleb128 0x7
+ 601 027f B2000000 		.4byte	.LVL26
+ 602 0283 32030000 		.4byte	0x332
+ 603 0287 91020000 		.4byte	0x291
+ 604 028b 08       		.uleb128 0x8
+ 605 028c 01       		.uleb128 0x1
+ 606 028d 50       		.byte	0x50
+ 607 028e 01       		.uleb128 0x1
+ 608 028f 35       		.byte	0x35
+ 609 0290 00       		.byte	0
+ 610 0291 0B       		.uleb128 0xb
+ 611 0292 B6000000 		.4byte	.LVL27
+ 612 0296 3D030000 		.4byte	0x33d
+ 613 029a 07       		.uleb128 0x7
+ 614 029b BE000000 		.4byte	.LVL28
+ 615 029f 27030000 		.4byte	0x327
+ 616 02a3 AD020000 		.4byte	0x2ad
+ 617 02a7 08       		.uleb128 0x8
+ 618 02a8 01       		.uleb128 0x1
+ 619 02a9 50       		.byte	0x50
+ 620 02aa 01       		.uleb128 0x1
+ 621 02ab 31       		.byte	0x31
+ 622 02ac 00       		.byte	0
+ 623 02ad 0B       		.uleb128 0xb
+ 624 02ae C6000000 		.4byte	.LVL29
+ 625 02b2 48030000 		.4byte	0x348
+ 626 02b6 07       		.uleb128 0x7
+ 627 02b7 CE000000 		.4byte	.LVL30
+ 628 02bb 27030000 		.4byte	0x327
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 14
+
+
+ 629 02bf C9020000 		.4byte	0x2c9
+ 630 02c3 08       		.uleb128 0x8
+ 631 02c4 01       		.uleb128 0x1
+ 632 02c5 50       		.byte	0x50
+ 633 02c6 01       		.uleb128 0x1
+ 634 02c7 31       		.byte	0x31
+ 635 02c8 00       		.byte	0
+ 636 02c9 0B       		.uleb128 0xb
+ 637 02ca D6000000 		.4byte	.LVL31
+ 638 02ce 53030000 		.4byte	0x353
+ 639 02d2 07       		.uleb128 0x7
+ 640 02d3 DE000000 		.4byte	.LVL32
+ 641 02d7 27030000 		.4byte	0x327
+ 642 02db E5020000 		.4byte	0x2e5
+ 643 02df 08       		.uleb128 0x8
+ 644 02e0 01       		.uleb128 0x1
+ 645 02e1 50       		.byte	0x50
+ 646 02e2 01       		.uleb128 0x1
+ 647 02e3 31       		.byte	0x31
+ 648 02e4 00       		.byte	0
+ 649 02e5 0B       		.uleb128 0xb
+ 650 02e6 E6000000 		.4byte	.LVL33
+ 651 02ea 5E030000 		.4byte	0x35e
+ 652 02ee 07       		.uleb128 0x7
+ 653 02ef EE000000 		.4byte	.LVL34
+ 654 02f3 27030000 		.4byte	0x327
+ 655 02f7 01030000 		.4byte	0x301
+ 656 02fb 08       		.uleb128 0x8
+ 657 02fc 01       		.uleb128 0x1
+ 658 02fd 50       		.byte	0x50
+ 659 02fe 01       		.uleb128 0x1
+ 660 02ff 31       		.byte	0x31
+ 661 0300 00       		.byte	0
+ 662 0301 09       		.uleb128 0x9
+ 663 0302 F8000000 		.4byte	.LVL35
+ 664 0306 27030000 		.4byte	0x327
+ 665 030a 08       		.uleb128 0x8
+ 666 030b 01       		.uleb128 0x1
+ 667 030c 50       		.byte	0x50
+ 668 030d 01       		.uleb128 0x1
+ 669 030e 31       		.byte	0x31
+ 670 030f 00       		.byte	0
+ 671 0310 00       		.byte	0
+ 672 0311 0C       		.uleb128 0xc
+ 673 0312 0A000000 		.4byte	.LASF16
+ 674 0316 0A000000 		.4byte	.LASF16
+ 675 031a 04       		.byte	0x4
+ 676 031b 26       		.byte	0x26
+ 677 031c 0C       		.uleb128 0xc
+ 678 031d 56000000 		.4byte	.LASF17
+ 679 0321 56000000 		.4byte	.LASF17
+ 680 0325 05       		.byte	0x5
+ 681 0326 26       		.byte	0x26
+ 682 0327 0C       		.uleb128 0xc
+ 683 0328 94010000 		.4byte	.LASF18
+ 684 032c 94010000 		.4byte	.LASF18
+ 685 0330 06       		.byte	0x6
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 15
+
+
+ 686 0331 26       		.byte	0x26
+ 687 0332 0C       		.uleb128 0xc
+ 688 0333 8F020000 		.4byte	.LASF19
+ 689 0337 8F020000 		.4byte	.LASF19
+ 690 033b 07       		.byte	0x7
+ 691 033c 76       		.byte	0x76
+ 692 033d 0C       		.uleb128 0xc
+ 693 033e 3B010000 		.4byte	.LASF20
+ 694 0342 3B010000 		.4byte	.LASF20
+ 695 0346 08       		.byte	0x8
+ 696 0347 29       		.byte	0x29
+ 697 0348 0C       		.uleb128 0xc
+ 698 0349 0E010000 		.4byte	.LASF21
+ 699 034d 0E010000 		.4byte	.LASF21
+ 700 0351 09       		.byte	0x9
+ 701 0352 29       		.byte	0x29
+ 702 0353 0C       		.uleb128 0xc
+ 703 0354 74020000 		.4byte	.LASF22
+ 704 0358 74020000 		.4byte	.LASF22
+ 705 035c 0A       		.byte	0xa
+ 706 035d 29       		.byte	0x29
+ 707 035e 0C       		.uleb128 0xc
+ 708 035f 26000000 		.4byte	.LASF23
+ 709 0363 26000000 		.4byte	.LASF23
+ 710 0367 0B       		.byte	0xb
+ 711 0368 29       		.byte	0x29
+ 712 0369 00       		.byte	0
+ 713              		.section	.debug_abbrev,"",%progbits
+ 714              	.Ldebug_abbrev0:
+ 715 0000 01       		.uleb128 0x1
+ 716 0001 11       		.uleb128 0x11
+ 717 0002 01       		.byte	0x1
+ 718 0003 25       		.uleb128 0x25
+ 719 0004 0E       		.uleb128 0xe
+ 720 0005 13       		.uleb128 0x13
+ 721 0006 0B       		.uleb128 0xb
+ 722 0007 03       		.uleb128 0x3
+ 723 0008 0E       		.uleb128 0xe
+ 724 0009 1B       		.uleb128 0x1b
+ 725 000a 0E       		.uleb128 0xe
+ 726 000b 55       		.uleb128 0x55
+ 727 000c 17       		.uleb128 0x17
+ 728 000d 11       		.uleb128 0x11
+ 729 000e 01       		.uleb128 0x1
+ 730 000f 10       		.uleb128 0x10
+ 731 0010 17       		.uleb128 0x17
+ 732 0011 00       		.byte	0
+ 733 0012 00       		.byte	0
+ 734 0013 02       		.uleb128 0x2
+ 735 0014 24       		.uleb128 0x24
+ 736 0015 00       		.byte	0
+ 737 0016 0B       		.uleb128 0xb
+ 738 0017 0B       		.uleb128 0xb
+ 739 0018 3E       		.uleb128 0x3e
+ 740 0019 0B       		.uleb128 0xb
+ 741 001a 03       		.uleb128 0x3
+ 742 001b 08       		.uleb128 0x8
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 16
+
+
+ 743 001c 00       		.byte	0
+ 744 001d 00       		.byte	0
+ 745 001e 03       		.uleb128 0x3
+ 746 001f 24       		.uleb128 0x24
+ 747 0020 00       		.byte	0
+ 748 0021 0B       		.uleb128 0xb
+ 749 0022 0B       		.uleb128 0xb
+ 750 0023 3E       		.uleb128 0x3e
+ 751 0024 0B       		.uleb128 0xb
+ 752 0025 03       		.uleb128 0x3
+ 753 0026 0E       		.uleb128 0xe
+ 754 0027 00       		.byte	0
+ 755 0028 00       		.byte	0
+ 756 0029 04       		.uleb128 0x4
+ 757 002a 16       		.uleb128 0x16
+ 758 002b 00       		.byte	0
+ 759 002c 03       		.uleb128 0x3
+ 760 002d 0E       		.uleb128 0xe
+ 761 002e 3A       		.uleb128 0x3a
+ 762 002f 0B       		.uleb128 0xb
+ 763 0030 3B       		.uleb128 0x3b
+ 764 0031 0B       		.uleb128 0xb
+ 765 0032 49       		.uleb128 0x49
+ 766 0033 13       		.uleb128 0x13
+ 767 0034 00       		.byte	0
+ 768 0035 00       		.byte	0
+ 769 0036 05       		.uleb128 0x5
+ 770 0037 2E       		.uleb128 0x2e
+ 771 0038 00       		.byte	0
+ 772 0039 3F       		.uleb128 0x3f
+ 773 003a 19       		.uleb128 0x19
+ 774 003b 03       		.uleb128 0x3
+ 775 003c 0E       		.uleb128 0xe
+ 776 003d 3A       		.uleb128 0x3a
+ 777 003e 0B       		.uleb128 0xb
+ 778 003f 3B       		.uleb128 0x3b
+ 779 0040 0B       		.uleb128 0xb
+ 780 0041 27       		.uleb128 0x27
+ 781 0042 19       		.uleb128 0x19
+ 782 0043 11       		.uleb128 0x11
+ 783 0044 01       		.uleb128 0x1
+ 784 0045 12       		.uleb128 0x12
+ 785 0046 06       		.uleb128 0x6
+ 786 0047 40       		.uleb128 0x40
+ 787 0048 18       		.uleb128 0x18
+ 788 0049 9742     		.uleb128 0x2117
+ 789 004b 19       		.uleb128 0x19
+ 790 004c 00       		.byte	0
+ 791 004d 00       		.byte	0
+ 792 004e 06       		.uleb128 0x6
+ 793 004f 2E       		.uleb128 0x2e
+ 794 0050 01       		.byte	0x1
+ 795 0051 3F       		.uleb128 0x3f
+ 796 0052 19       		.uleb128 0x19
+ 797 0053 03       		.uleb128 0x3
+ 798 0054 0E       		.uleb128 0xe
+ 799 0055 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 17
+
+
+ 800 0056 0B       		.uleb128 0xb
+ 801 0057 3B       		.uleb128 0x3b
+ 802 0058 0B       		.uleb128 0xb
+ 803 0059 27       		.uleb128 0x27
+ 804 005a 19       		.uleb128 0x19
+ 805 005b 11       		.uleb128 0x11
+ 806 005c 01       		.uleb128 0x1
+ 807 005d 12       		.uleb128 0x12
+ 808 005e 06       		.uleb128 0x6
+ 809 005f 40       		.uleb128 0x40
+ 810 0060 18       		.uleb128 0x18
+ 811 0061 9742     		.uleb128 0x2117
+ 812 0063 19       		.uleb128 0x19
+ 813 0064 01       		.uleb128 0x1
+ 814 0065 13       		.uleb128 0x13
+ 815 0066 00       		.byte	0
+ 816 0067 00       		.byte	0
+ 817 0068 07       		.uleb128 0x7
+ 818 0069 898201   		.uleb128 0x4109
+ 819 006c 01       		.byte	0x1
+ 820 006d 11       		.uleb128 0x11
+ 821 006e 01       		.uleb128 0x1
+ 822 006f 31       		.uleb128 0x31
+ 823 0070 13       		.uleb128 0x13
+ 824 0071 01       		.uleb128 0x1
+ 825 0072 13       		.uleb128 0x13
+ 826 0073 00       		.byte	0
+ 827 0074 00       		.byte	0
+ 828 0075 08       		.uleb128 0x8
+ 829 0076 8A8201   		.uleb128 0x410a
+ 830 0079 00       		.byte	0
+ 831 007a 02       		.uleb128 0x2
+ 832 007b 18       		.uleb128 0x18
+ 833 007c 9142     		.uleb128 0x2111
+ 834 007e 18       		.uleb128 0x18
+ 835 007f 00       		.byte	0
+ 836 0080 00       		.byte	0
+ 837 0081 09       		.uleb128 0x9
+ 838 0082 898201   		.uleb128 0x4109
+ 839 0085 01       		.byte	0x1
+ 840 0086 11       		.uleb128 0x11
+ 841 0087 01       		.uleb128 0x1
+ 842 0088 31       		.uleb128 0x31
+ 843 0089 13       		.uleb128 0x13
+ 844 008a 00       		.byte	0
+ 845 008b 00       		.byte	0
+ 846 008c 0A       		.uleb128 0xa
+ 847 008d 2E       		.uleb128 0x2e
+ 848 008e 01       		.byte	0x1
+ 849 008f 3F       		.uleb128 0x3f
+ 850 0090 19       		.uleb128 0x19
+ 851 0091 03       		.uleb128 0x3
+ 852 0092 0E       		.uleb128 0xe
+ 853 0093 3A       		.uleb128 0x3a
+ 854 0094 0B       		.uleb128 0xb
+ 855 0095 3B       		.uleb128 0x3b
+ 856 0096 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 18
+
+
+ 857 0097 27       		.uleb128 0x27
+ 858 0098 19       		.uleb128 0x19
+ 859 0099 49       		.uleb128 0x49
+ 860 009a 13       		.uleb128 0x13
+ 861 009b 11       		.uleb128 0x11
+ 862 009c 01       		.uleb128 0x1
+ 863 009d 12       		.uleb128 0x12
+ 864 009e 06       		.uleb128 0x6
+ 865 009f 40       		.uleb128 0x40
+ 866 00a0 18       		.uleb128 0x18
+ 867 00a1 9742     		.uleb128 0x2117
+ 868 00a3 19       		.uleb128 0x19
+ 869 00a4 01       		.uleb128 0x1
+ 870 00a5 13       		.uleb128 0x13
+ 871 00a6 00       		.byte	0
+ 872 00a7 00       		.byte	0
+ 873 00a8 0B       		.uleb128 0xb
+ 874 00a9 898201   		.uleb128 0x4109
+ 875 00ac 00       		.byte	0
+ 876 00ad 11       		.uleb128 0x11
+ 877 00ae 01       		.uleb128 0x1
+ 878 00af 31       		.uleb128 0x31
+ 879 00b0 13       		.uleb128 0x13
+ 880 00b1 00       		.byte	0
+ 881 00b2 00       		.byte	0
+ 882 00b3 0C       		.uleb128 0xc
+ 883 00b4 2E       		.uleb128 0x2e
+ 884 00b5 00       		.byte	0
+ 885 00b6 3F       		.uleb128 0x3f
+ 886 00b7 19       		.uleb128 0x19
+ 887 00b8 3C       		.uleb128 0x3c
+ 888 00b9 19       		.uleb128 0x19
+ 889 00ba 6E       		.uleb128 0x6e
+ 890 00bb 0E       		.uleb128 0xe
+ 891 00bc 03       		.uleb128 0x3
+ 892 00bd 0E       		.uleb128 0xe
+ 893 00be 3A       		.uleb128 0x3a
+ 894 00bf 0B       		.uleb128 0xb
+ 895 00c0 3B       		.uleb128 0x3b
+ 896 00c1 0B       		.uleb128 0xb
+ 897 00c2 00       		.byte	0
+ 898 00c3 00       		.byte	0
+ 899 00c4 00       		.byte	0
+ 900              		.section	.debug_aranges,"",%progbits
+ 901 0000 2C000000 		.4byte	0x2c
+ 902 0004 0200     		.2byte	0x2
+ 903 0006 00000000 		.4byte	.Ldebug_info0
+ 904 000a 04       		.byte	0x4
+ 905 000b 00       		.byte	0
+ 906 000c 0000     		.2byte	0
+ 907 000e 0000     		.2byte	0
+ 908 0010 00000000 		.4byte	.LFB0
+ 909 0014 02000000 		.4byte	.LFE0-.LFB0
+ 910 0018 00000000 		.4byte	.LFB1
+ 911 001c 16000000 		.4byte	.LFE1-.LFB1
+ 912 0020 00000000 		.4byte	.LFB2
+ 913 0024 FC000000 		.4byte	.LFE2-.LFB2
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 19
+
+
+ 914 0028 00000000 		.4byte	0
+ 915 002c 00000000 		.4byte	0
+ 916              		.section	.debug_ranges,"",%progbits
+ 917              	.Ldebug_ranges0:
+ 918 0000 00000000 		.4byte	.LFB0
+ 919 0004 02000000 		.4byte	.LFE0
+ 920 0008 00000000 		.4byte	.LFB1
+ 921 000c 16000000 		.4byte	.LFE1
+ 922 0010 00000000 		.4byte	.LFB2
+ 923 0014 FC000000 		.4byte	.LFE2
+ 924 0018 00000000 		.4byte	0
+ 925 001c 00000000 		.4byte	0
+ 926              		.section	.debug_line,"",%progbits
+ 927              	.Ldebug_line0:
+ 928 0000 44020000 		.section	.debug_str,"MS",%progbits,1
+ 928      0200DE01 
+ 928      00000201 
+ 928      FB0E0D00 
+ 928      01010101 
+ 929              	.LASF12:
+ 930 0000 5F5F7569 		.ascii	"__uint8_t\000"
+ 930      6E74385F 
+ 930      7400
+ 931              	.LASF16:
+ 932 000a 6B657962 		.ascii	"keyboard_KeyboardCol1_Write\000"
+ 932      6F617264 
+ 932      5F4B6579 
+ 932      626F6172 
+ 932      64436F6C 
+ 933              	.LASF23:
+ 934 0026 6B657962 		.ascii	"keyboard_KeyboardRow3_Read\000"
+ 934      6F617264 
+ 934      5F4B6579 
+ 934      626F6172 
+ 934      64526F77 
+ 935              	.LASF14:
+ 936 0041 666C6F61 		.ascii	"float\000"
+ 936      7400
+ 937              	.LASF28:
+ 938 0047 6B657962 		.ascii	"keyboard_Start\000"
+ 938      6F617264 
+ 938      5F537461 
+ 938      727400
+ 939              	.LASF17:
+ 940 0056 6B657962 		.ascii	"keyboard_KeyboardCol2_Write\000"
+ 940      6F617264 
+ 940      5F4B6579 
+ 940      626F6172 
+ 940      64436F6C 
+ 941              	.LASF4:
+ 942 0072 756E7369 		.ascii	"unsigned char\000"
+ 942      676E6564 
+ 942      20636861 
+ 942      7200
+ 943              	.LASF24:
+ 944 0080 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 944      43313120 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 20
+
+
+ 944      352E342E 
+ 944      31203230 
+ 944      31363036 
+ 945 00b3 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 945      20726576 
+ 945      6973696F 
+ 945      6E203233 
+ 945      37373135 
+ 946 00e6 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 946      66756E63 
+ 946      74696F6E 
+ 946      2D736563 
+ 946      74696F6E 
+ 947              	.LASF21:
+ 948 010e 6B657962 		.ascii	"keyboard_KeyboardRow1_Read\000"
+ 948      6F617264 
+ 948      5F4B6579 
+ 948      626F6172 
+ 948      64526F77 
+ 949              	.LASF8:
+ 950 0129 6C6F6E67 		.ascii	"long unsigned int\000"
+ 950      20756E73 
+ 950      69676E65 
+ 950      6420696E 
+ 950      7400
+ 951              	.LASF20:
+ 952 013b 6B657962 		.ascii	"keyboard_KeyboardRow0_Read\000"
+ 952      6F617264 
+ 952      5F4B6579 
+ 952      626F6172 
+ 952      64526F77 
+ 953              	.LASF6:
+ 954 0156 73686F72 		.ascii	"short unsigned int\000"
+ 954      7420756E 
+ 954      7369676E 
+ 954      65642069 
+ 954      6E7400
+ 955              	.LASF25:
+ 956 0169 47656E65 		.ascii	"Generated_Source\\PSoC5\\keyboard_keyboard.c\000"
+ 956      72617465 
+ 956      645F536F 
+ 956      75726365 
+ 956      5C50536F 
+ 957              	.LASF18:
+ 958 0194 6B657962 		.ascii	"keyboard_KeyboardCol3_Write\000"
+ 958      6F617264 
+ 958      5F4B6579 
+ 958      626F6172 
+ 958      64436F6C 
+ 959              	.LASF29:
+ 960 01b0 6B657962 		.ascii	"keyboard_Scan\000"
+ 960      6F617264 
+ 960      5F536361 
+ 960      6E00
+ 961              	.LASF15:
+ 962 01be 646F7562 		.ascii	"double\000"
+ 962      6C6500
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 21
+
+
+ 963              	.LASF0:
+ 964 01c5 756E7369 		.ascii	"unsigned int\000"
+ 964      676E6564 
+ 964      20696E74 
+ 964      00
+ 965              	.LASF9:
+ 966 01d2 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 966      206C6F6E 
+ 966      6720756E 
+ 966      7369676E 
+ 966      65642069 
+ 967              	.LASF13:
+ 968 01e9 75696E74 		.ascii	"uint8_t\000"
+ 968      385F7400 
+ 969              	.LASF10:
+ 970 01f1 73697A65 		.ascii	"sizetype\000"
+ 970      74797065 
+ 970      00
+ 971              	.LASF1:
+ 972 01fa 6C6F6E67 		.ascii	"long long int\000"
+ 972      206C6F6E 
+ 972      6720696E 
+ 972      7400
+ 973              	.LASF11:
+ 974 0208 63686172 		.ascii	"char\000"
+ 974      00
+ 975              	.LASF26:
+ 976 020d 443A5C4E 		.ascii	"D:\\Notes 202324\\ELECH410\\Labs\\Lab1\\Lab1.cydsn\000"
+ 976      6F746573 
+ 976      20323032 
+ 976      3332345C 
+ 976      454C4543 
+ 977              	.LASF5:
+ 978 023b 73686F72 		.ascii	"short int\000"
+ 978      7420696E 
+ 978      7400
+ 979              	.LASF27:
+ 980 0245 6B657962 		.ascii	"keyboard_Test\000"
+ 980      6F617264 
+ 980      5F546573 
+ 980      7400
+ 981              	.LASF7:
+ 982 0253 6C6F6E67 		.ascii	"long int\000"
+ 982      20696E74 
+ 982      00
+ 983              	.LASF2:
+ 984 025c 6C6F6E67 		.ascii	"long double\000"
+ 984      20646F75 
+ 984      626C6500 
+ 985              	.LASF3:
+ 986 0268 7369676E 		.ascii	"signed char\000"
+ 986      65642063 
+ 986      68617200 
+ 987              	.LASF22:
+ 988 0274 6B657962 		.ascii	"keyboard_KeyboardRow2_Read\000"
+ 988      6F617264 
+ 988      5F4B6579 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccG852nY.s 			page 22
+
+
+ 988      626F6172 
+ 988      64526F77 
+ 989              	.LASF19:
+ 990 028f 43794465 		.ascii	"CyDelay\000"
+ 990      6C617900 
+ 991              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

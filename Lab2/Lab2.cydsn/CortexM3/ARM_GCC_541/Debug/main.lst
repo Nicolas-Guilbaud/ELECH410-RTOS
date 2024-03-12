@@ -1,0 +1,1391 @@
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.handler,"ax",%progbits
+  20              		.align	2
+  21              		.global	handler
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	handler, %function
+  25              	handler:
+  26              	.LFB63:
+  27              		.file 1 "main.c"
+   1:main.c        **** /* ========================================
+   2:main.c        ****  *
+   3:main.c        ****  * Copyright YOUR COMPANY, THE YEAR
+   4:main.c        ****  * All Rights Reserved
+   5:main.c        ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:main.c        ****  *
+   7:main.c        ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:main.c        ****  * WHICH IS THE PROPERTY OF your company.
+   9:main.c        ****  *
+  10:main.c        ****  * ========================================
+  11:main.c        **** */
+  12:main.c        **** #include "project.h"
+  13:main.c        **** 
+  14:main.c        **** // Task prototypes
+  15:main.c        **** void        adc_task();
+  16:main.c        **** void        lcd_task(); 
+  17:main.c        **** void        led_task(); 
+  18:main.c        **** void        event_sw1_task();
+  19:main.c        **** 
+  20:main.c        **** uint8 scheduler[6][3] = {
+  21:main.c        ****     {1,2,3},
+  22:main.c        ****     {1,0,0},
+  23:main.c        ****     {1,2,0},
+  24:main.c        ****     {1,0,3},
+  25:main.c        ****     {1,2,0},
+  26:main.c        ****     {1,0,0}
+  27:main.c        **** };
+  28:main.c        **** 
+  29:main.c        **** uint8 counter = 0;
+  30:main.c        **** 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 2
+
+
+  31:main.c        **** uint8 flags[] = {0,0,0};
+  32:main.c        **** 
+  33:main.c        **** int c = 0;
+  34:main.c        **** 
+  35:main.c        **** CY_ISR(handler){
+  28              		.loc 1 35 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+  35              		.cfi_offset 14, -4
+  36:main.c        ****     
+  37:main.c        ****     
+  38:main.c        ****     
+  39:main.c        ****     
+  40:main.c        ****     counter = (counter+1) %6;
+  36              		.loc 1 40 0
+  37 0002 1749     		ldr	r1, .L7
+  38 0004 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+  39 0006 0133     		adds	r3, r3, #1
+  40 0008 164A     		ldr	r2, .L7+4
+  41 000a 82FB0302 		smull	r0, r2, r2, r3
+  42 000e A2EBE372 		sub	r2, r2, r3, asr #31
+  43 0012 02EB4202 		add	r2, r2, r2, lsl #1
+  44 0016 5000     		lsls	r0, r2, #1
+  45 0018 1A1A     		subs	r2, r3, r0
+  46 001a D2B2     		uxtb	r2, r2
+  47 001c 0A70     		strb	r2, [r1]
+  48              	.LVL0:
+  49              	.LBB2:
+  41:main.c        ****     
+  42:main.c        ****     
+  43:main.c        ****     for(uint8 i = 0; i < 3; i++){
+  50              		.loc 1 43 0
+  51 001e 0023     		movs	r3, #0
+  52 0020 0BE0     		b	.L2
+  53              	.LVL1:
+  54              	.L3:
+  55              	.LBB3:
+  44:main.c        ****         uint8 value = scheduler[counter][i];
+  56              		.loc 1 44 0 discriminator 3
+  57 0022 02EB4201 		add	r1, r2, r2, lsl #1
+  58 0026 1048     		ldr	r0, .L7+8
+  59 0028 0144     		add	r1, r1, r0
+  60 002a C95C     		ldrb	r1, [r1, r3]	@ zero_extendqisi2
+  61              	.LVL2:
+  45:main.c        ****         flags[value-1] = 1;
+  62              		.loc 1 45 0 discriminator 3
+  63 002c 0139     		subs	r1, r1, #1
+  64              	.LVL3:
+  65 002e 0C48     		ldr	r0, .L7
+  66 0030 0144     		add	r1, r1, r0
+  67              	.LVL4:
+  68 0032 0120     		movs	r0, #1
+  69 0034 0871     		strb	r0, [r1, #4]
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 3
+
+
+  70              	.LBE3:
+  43:main.c        ****         uint8 value = scheduler[counter][i];
+  71              		.loc 1 43 0 discriminator 3
+  72 0036 0344     		add	r3, r3, r0
+  73              	.LVL5:
+  74 0038 DBB2     		uxtb	r3, r3
+  75              	.LVL6:
+  76              	.L2:
+  43:main.c        ****         uint8 value = scheduler[counter][i];
+  77              		.loc 1 43 0 is_stmt 0 discriminator 1
+  78 003a 022B     		cmp	r3, #2
+  79 003c F1D9     		bls	.L3
+  80              	.LBE2:
+  46:main.c        ****     }
+  47:main.c        ****     
+  48:main.c        ****     if(c) c--;
+  81              		.loc 1 48 0 is_stmt 1
+  82 003e 084B     		ldr	r3, .L7
+  83              	.LVL7:
+  84 0040 9B68     		ldr	r3, [r3, #8]
+  85 0042 1BB1     		cbz	r3, .L4
+  86              		.loc 1 48 0 is_stmt 0 discriminator 1
+  87 0044 013B     		subs	r3, r3, #1
+  88 0046 064A     		ldr	r2, .L7
+  89 0048 9360     		str	r3, [r2, #8]
+  90 004a 02E0     		b	.L5
+  91              	.L4:
+  49:main.c        ****     else c++;
+  92              		.loc 1 49 0 is_stmt 1
+  93 004c 0133     		adds	r3, r3, #1
+  94 004e 044A     		ldr	r2, .L7
+  95 0050 9360     		str	r3, [r2, #8]
+  96              	.L5:
+  50:main.c        ****     
+  51:main.c        ****     GPIOJ12_Write(c);
+  97              		.loc 1 51 0
+  98 0052 034B     		ldr	r3, .L7
+  99 0054 187A     		ldrb	r0, [r3, #8]	@ zero_extendqisi2
+ 100 0056 FFF7FEFF 		bl	GPIOJ12_Write
+ 101              	.LVL8:
+  52:main.c        ****     
+  53:main.c        ****     
+  54:main.c        ****     Timer_ReadStatusRegister();
+ 102              		.loc 1 54 0
+ 103 005a FFF7FEFF 		bl	Timer_ReadStatusRegister
+ 104              	.LVL9:
+ 105 005e 08BD     		pop	{r3, pc}
+ 106              	.L8:
+ 107              		.align	2
+ 108              	.L7:
+ 109 0060 00000000 		.word	.LANCHOR0
+ 110 0064 ABAAAA2A 		.word	715827883
+ 111 0068 00000000 		.word	.LANCHOR1
+ 112              		.cfi_endproc
+ 113              	.LFE63:
+ 114              		.size	handler, .-handler
+ 115              		.section	.text.select_task,"ax",%progbits
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 4
+
+
+ 116              		.align	2
+ 117              		.global	select_task
+ 118              		.thumb
+ 119              		.thumb_func
+ 120              		.type	select_task, %function
+ 121              	select_task:
+ 122              	.LFB64:
+  55:main.c        **** }
+  56:main.c        **** 
+  57:main.c        **** void select_task(uint8 nber){
+ 123              		.loc 1 57 0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127              		@ link register save eliminated.
+ 128              	.LVL10:
+ 129 0000 7047     		bx	lr
+ 130              		.cfi_endproc
+ 131              	.LFE64:
+ 132              		.size	select_task, .-select_task
+ 133 0002 00BF     		.section	.text.main,"ax",%progbits
+ 134              		.align	2
+ 135              		.global	main
+ 136              		.thumb
+ 137              		.thumb_func
+ 138              		.type	main, %function
+ 139              	main:
+ 140              	.LFB65:
+  58:main.c        ****     switch(nber){
+  59:main.c        ****         case 1: 
+  60:main.c        ****             adc_task();
+  61:main.c        ****             break;
+  62:main.c        ****         default: 
+  63:main.c        ****             break;
+  64:main.c        ****     }
+  65:main.c        **** }
+  66:main.c        **** 
+  67:main.c        **** int main(void)
+  68:main.c        **** {
+ 141              		.loc 1 68 0
+ 142              		.cfi_startproc
+ 143              		@ args = 0, pretend = 0, frame = 0
+ 144              		@ frame_needed = 0, uses_anonymous_args = 0
+ 145              		.loc 1 68 0
+ 146 0000 08B5     		push	{r3, lr}
+ 147              		.cfi_def_cfa_offset 8
+ 148              		.cfi_offset 3, -8
+ 149              		.cfi_offset 14, -4
+  69:main.c        ****     CyGlobalIntEnable; /* Enable global interrupts. */
+ 150              		.loc 1 69 0
+ 151              		.syntax unified
+ 152              	@ 69 "main.c" 1
+ 153 0002 62B6     		CPSIE   i
+ 154              	@ 0 "" 2
+  70:main.c        **** 
+  71:main.c        ****     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+  72:main.c        **** 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 5
+
+
+  73:main.c        ****     isr_timer_StartEx(handler);
+ 155              		.loc 1 73 0
+ 156              		.thumb
+ 157              		.syntax unified
+ 158 0004 0948     		ldr	r0, .L16
+ 159 0006 FFF7FEFF 		bl	isr_timer_StartEx
+ 160              	.LVL11:
+  74:main.c        ****     Timer_Start();
+ 161              		.loc 1 74 0
+ 162 000a FFF7FEFF 		bl	Timer_Start
+ 163              	.LVL12:
+ 164              	.L14:
+ 165              	.LBB4:
+  75:main.c        ****     
+  76:main.c        ****     for(;;)
+  77:main.c        ****     {
+  78:main.c        ****         /* Place your application code here. */
+  79:main.c        ****         for(uint8 i = 0; i < 3; i++){
+ 166              		.loc 1 79 0
+ 167 000e 0023     		movs	r3, #0
+ 168 0010 09E0     		b	.L11
+ 169              	.LVL13:
+ 170              	.L13:
+  80:main.c        ****             
+  81:main.c        ****             if(flags[i]){
+ 171              		.loc 1 81 0
+ 172 0012 074A     		ldr	r2, .L16+4
+ 173 0014 1A44     		add	r2, r2, r3
+ 174 0016 1279     		ldrb	r2, [r2, #4]	@ zero_extendqisi2
+ 175 0018 1AB1     		cbz	r2, .L12
+  82:main.c        ****                 select_task(i);
+  83:main.c        ****                 flags[i] = 0;
+ 176              		.loc 1 83 0
+ 177 001a 054A     		ldr	r2, .L16+4
+ 178 001c 1A44     		add	r2, r2, r3
+ 179 001e 0021     		movs	r1, #0
+ 180 0020 1171     		strb	r1, [r2, #4]
+ 181              	.L12:
+  79:main.c        ****             
+ 182              		.loc 1 79 0 discriminator 2
+ 183 0022 0133     		adds	r3, r3, #1
+ 184              	.LVL14:
+ 185 0024 DBB2     		uxtb	r3, r3
+ 186              	.LVL15:
+ 187              	.L11:
+  79:main.c        ****             
+ 188              		.loc 1 79 0 is_stmt 0 discriminator 1
+ 189 0026 022B     		cmp	r3, #2
+ 190 0028 F3D9     		bls	.L13
+ 191 002a F0E7     		b	.L14
+ 192              	.L17:
+ 193              		.align	2
+ 194              	.L16:
+ 195 002c 00000000 		.word	handler
+ 196 0030 00000000 		.word	.LANCHOR0
+ 197              	.LBE4:
+ 198              		.cfi_endproc
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 6
+
+
+ 199              	.LFE65:
+ 200              		.size	main, .-main
+ 201              		.section	.text.adc_task,"ax",%progbits
+ 202              		.align	2
+ 203              		.global	adc_task
+ 204              		.thumb
+ 205              		.thumb_func
+ 206              		.type	adc_task, %function
+ 207              	adc_task:
+ 208              	.LFB66:
+  84:main.c        ****             }
+  85:main.c        ****             
+  86:main.c        ****         }
+  87:main.c        ****         
+  88:main.c        ****     }
+  89:main.c        **** }
+  90:main.c        **** 
+  91:main.c        **** void adc_task(){
+ 209              		.loc 1 91 0 is_stmt 1
+ 210              		.cfi_startproc
+ 211              		@ args = 0, pretend = 0, frame = 0
+ 212              		@ frame_needed = 0, uses_anonymous_args = 0
+ 213              		@ link register save eliminated.
+ 214 0000 7047     		bx	lr
+ 215              		.cfi_endproc
+ 216              	.LFE66:
+ 217              		.size	adc_task, .-adc_task
+ 218 0002 00BF     		.section	.text.led_task,"ax",%progbits
+ 219              		.align	2
+ 220              		.global	led_task
+ 221              		.thumb
+ 222              		.thumb_func
+ 223              		.type	led_task, %function
+ 224              	led_task:
+ 225              	.LFB67:
+  92:main.c        ****     
+  93:main.c        **** }
+  94:main.c        **** 
+  95:main.c        **** void led_task(){
+ 226              		.loc 1 95 0
+ 227              		.cfi_startproc
+ 228              		@ args = 0, pretend = 0, frame = 0
+ 229              		@ frame_needed = 0, uses_anonymous_args = 0
+ 230              		@ link register save eliminated.
+ 231 0000 7047     		bx	lr
+ 232              		.cfi_endproc
+ 233              	.LFE67:
+ 234              		.size	led_task, .-led_task
+ 235 0002 00BF     		.section	.text.lcd_task,"ax",%progbits
+ 236              		.align	2
+ 237              		.global	lcd_task
+ 238              		.thumb
+ 239              		.thumb_func
+ 240              		.type	lcd_task, %function
+ 241              	lcd_task:
+ 242              	.LFB68:
+  96:main.c        **** }
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 7
+
+
+  97:main.c        ****     
+  98:main.c        **** void lcd_task(){
+ 243              		.loc 1 98 0
+ 244              		.cfi_startproc
+ 245              		@ args = 0, pretend = 0, frame = 0
+ 246              		@ frame_needed = 0, uses_anonymous_args = 0
+ 247              		@ link register save eliminated.
+ 248 0000 7047     		bx	lr
+ 249              		.cfi_endproc
+ 250              	.LFE68:
+ 251              		.size	lcd_task, .-lcd_task
+ 252 0002 00BF     		.section	.text.event_sw1_task,"ax",%progbits
+ 253              		.align	2
+ 254              		.global	event_sw1_task
+ 255              		.thumb
+ 256              		.thumb_func
+ 257              		.type	event_sw1_task, %function
+ 258              	event_sw1_task:
+ 259              	.LFB69:
+  99:main.c        **** }
+ 100:main.c        **** 
+ 101:main.c        **** void event_sw1_task(){
+ 260              		.loc 1 101 0
+ 261              		.cfi_startproc
+ 262              		@ args = 0, pretend = 0, frame = 0
+ 263              		@ frame_needed = 0, uses_anonymous_args = 0
+ 264              		@ link register save eliminated.
+ 265 0000 7047     		bx	lr
+ 266              		.cfi_endproc
+ 267              	.LFE69:
+ 268              		.size	event_sw1_task, .-event_sw1_task
+ 269              		.global	c
+ 270              		.global	flags
+ 271              		.global	counter
+ 272              		.global	scheduler
+ 273 0002 00BF     		.data
+ 274              		.align	2
+ 275              		.set	.LANCHOR1,. + 0
+ 276              		.type	scheduler, %object
+ 277              		.size	scheduler, 18
+ 278              	scheduler:
+ 279 0000 01       		.byte	1
+ 280 0001 02       		.byte	2
+ 281 0002 03       		.byte	3
+ 282 0003 01       		.byte	1
+ 283 0004 00       		.byte	0
+ 284 0005 00       		.byte	0
+ 285 0006 01       		.byte	1
+ 286 0007 02       		.byte	2
+ 287 0008 00       		.byte	0
+ 288 0009 01       		.byte	1
+ 289 000a 00       		.byte	0
+ 290 000b 03       		.byte	3
+ 291 000c 01       		.byte	1
+ 292 000d 02       		.byte	2
+ 293 000e 00       		.byte	0
+ 294 000f 01       		.byte	1
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 8
+
+
+ 295 0010 00       		.byte	0
+ 296 0011 00       		.byte	0
+ 297              		.bss
+ 298              		.align	2
+ 299              		.set	.LANCHOR0,. + 0
+ 300              		.type	counter, %object
+ 301              		.size	counter, 1
+ 302              	counter:
+ 303 0000 00       		.space	1
+ 304 0001 000000   		.space	3
+ 305              		.type	flags, %object
+ 306              		.size	flags, 3
+ 307              	flags:
+ 308 0004 000000   		.space	3
+ 309 0007 00       		.space	1
+ 310              		.type	c, %object
+ 311              		.size	c, 4
+ 312              	c:
+ 313 0008 00000000 		.space	4
+ 314              		.text
+ 315              	.Letext0:
+ 316              		.file 2 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 317              		.file 3 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 318              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 319              		.file 5 "Generated_Source\\PSoC5/core_cm3.h"
+ 320              		.file 6 "Generated_Source\\PSoC5/GPIOJ12.h"
+ 321              		.file 7 "Generated_Source\\PSoC5/Timer.h"
+ 322              		.file 8 "Generated_Source\\PSoC5/isr_timer.h"
+ 323              		.section	.debug_info,"",%progbits
+ 324              	.Ldebug_info0:
+ 325 0000 6A020000 		.4byte	0x26a
+ 326 0004 0400     		.2byte	0x4
+ 327 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 328 000a 04       		.byte	0x4
+ 329 000b 01       		.uleb128 0x1
+ 330 000c 77000000 		.4byte	.LASF32
+ 331 0010 0C       		.byte	0xc
+ 332 0011 E2010000 		.4byte	.LASF33
+ 333 0015 4C010000 		.4byte	.LASF34
+ 334 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 335 001d 00000000 		.4byte	0
+ 336 0021 00000000 		.4byte	.Ldebug_line0
+ 337 0025 02       		.uleb128 0x2
+ 338 0026 01       		.byte	0x1
+ 339 0027 06       		.byte	0x6
+ 340 0028 2D020000 		.4byte	.LASF0
+ 341 002c 02       		.uleb128 0x2
+ 342 002d 01       		.byte	0x1
+ 343 002e 08       		.byte	0x8
+ 344 002f 69000000 		.4byte	.LASF1
+ 345 0033 02       		.uleb128 0x2
+ 346 0034 02       		.byte	0x2
+ 347 0035 05       		.byte	0x5
+ 348 0036 EE010000 		.4byte	.LASF2
+ 349 003a 02       		.uleb128 0x2
+ 350 003b 02       		.byte	0x2
+ 351 003c 07       		.byte	0x7
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 9
+
+
+ 352 003d 17010000 		.4byte	.LASF3
+ 353 0041 03       		.uleb128 0x3
+ 354 0042 15000000 		.4byte	.LASF9
+ 355 0046 02       		.byte	0x2
+ 356 0047 3F       		.byte	0x3f
+ 357 0048 4C000000 		.4byte	0x4c
+ 358 004c 02       		.uleb128 0x2
+ 359 004d 04       		.byte	0x4
+ 360 004e 05       		.byte	0x5
+ 361 004f 18020000 		.4byte	.LASF4
+ 362 0053 02       		.uleb128 0x2
+ 363 0054 04       		.byte	0x4
+ 364 0055 07       		.byte	0x7
+ 365 0056 05010000 		.4byte	.LASF5
+ 366 005a 02       		.uleb128 0x2
+ 367 005b 08       		.byte	0x8
+ 368 005c 05       		.byte	0x5
+ 369 005d D4010000 		.4byte	.LASF6
+ 370 0061 02       		.uleb128 0x2
+ 371 0062 08       		.byte	0x8
+ 372 0063 07       		.byte	0x7
+ 373 0064 AC010000 		.4byte	.LASF7
+ 374 0068 04       		.uleb128 0x4
+ 375 0069 04       		.byte	0x4
+ 376 006a 05       		.byte	0x5
+ 377 006b 696E7400 		.ascii	"int\000"
+ 378 006f 02       		.uleb128 0x2
+ 379 0070 04       		.byte	0x4
+ 380 0071 07       		.byte	0x7
+ 381 0072 90010000 		.4byte	.LASF8
+ 382 0076 03       		.uleb128 0x3
+ 383 0077 38000000 		.4byte	.LASF10
+ 384 007b 03       		.byte	0x3
+ 385 007c 2C       		.byte	0x2c
+ 386 007d 41000000 		.4byte	0x41
+ 387 0081 05       		.uleb128 0x5
+ 388 0082 F8010000 		.4byte	.LASF11
+ 389 0086 04       		.byte	0x4
+ 390 0087 E801     		.2byte	0x1e8
+ 391 0089 2C000000 		.4byte	0x2c
+ 392 008d 02       		.uleb128 0x2
+ 393 008e 04       		.byte	0x4
+ 394 008f 04       		.byte	0x4
+ 395 0090 52000000 		.4byte	.LASF12
+ 396 0094 02       		.uleb128 0x2
+ 397 0095 08       		.byte	0x8
+ 398 0096 04       		.byte	0x4
+ 399 0097 40010000 		.4byte	.LASF13
+ 400 009b 02       		.uleb128 0x2
+ 401 009c 01       		.byte	0x1
+ 402 009d 08       		.byte	0x8
+ 403 009e E9010000 		.4byte	.LASF14
+ 404 00a2 02       		.uleb128 0x2
+ 405 00a3 08       		.byte	0x8
+ 406 00a4 04       		.byte	0x4
+ 407 00a5 21020000 		.4byte	.LASF15
+ 408 00a9 02       		.uleb128 0x2
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 10
+
+
+ 409 00aa 04       		.byte	0x4
+ 410 00ab 07       		.byte	0x7
+ 411 00ac CB010000 		.4byte	.LASF16
+ 412 00b0 06       		.uleb128 0x6
+ 413 00b1 C3010000 		.4byte	.LASF18
+ 414 00b5 01       		.byte	0x1
+ 415 00b6 23       		.byte	0x23
+ 416 00b7 00000000 		.4byte	.LFB63
+ 417 00bb 6C000000 		.4byte	.LFE63-.LFB63
+ 418 00bf 01       		.uleb128 0x1
+ 419 00c0 9C       		.byte	0x9c
+ 420 00c1 0C010000 		.4byte	0x10c
+ 421 00c5 07       		.uleb128 0x7
+ 422 00c6 1E000000 		.4byte	.LBB2
+ 423 00ca 20000000 		.4byte	.LBE2-.LBB2
+ 424 00ce F9000000 		.4byte	0xf9
+ 425 00d2 08       		.uleb128 0x8
+ 426 00d3 6900     		.ascii	"i\000"
+ 427 00d5 01       		.byte	0x1
+ 428 00d6 2B       		.byte	0x2b
+ 429 00d7 81000000 		.4byte	0x81
+ 430 00db 00000000 		.4byte	.LLST0
+ 431 00df 09       		.uleb128 0x9
+ 432 00e0 22000000 		.4byte	.LBB3
+ 433 00e4 14000000 		.4byte	.LBE3-.LBB3
+ 434 00e8 0A       		.uleb128 0xa
+ 435 00e9 0F000000 		.4byte	.LASF17
+ 436 00ed 01       		.byte	0x1
+ 437 00ee 2C       		.byte	0x2c
+ 438 00ef 81000000 		.4byte	0x81
+ 439 00f3 2A000000 		.4byte	.LLST1
+ 440 00f7 00       		.byte	0
+ 441 00f8 00       		.byte	0
+ 442 00f9 0B       		.uleb128 0xb
+ 443 00fa 5A000000 		.4byte	.LVL8
+ 444 00fe 41020000 		.4byte	0x241
+ 445 0102 0B       		.uleb128 0xb
+ 446 0103 5E000000 		.4byte	.LVL9
+ 447 0107 4C020000 		.4byte	0x24c
+ 448 010b 00       		.byte	0
+ 449 010c 06       		.uleb128 0x6
+ 450 010d 0C020000 		.4byte	.LASF19
+ 451 0111 01       		.byte	0x1
+ 452 0112 39       		.byte	0x39
+ 453 0113 00000000 		.4byte	.LFB64
+ 454 0117 02000000 		.4byte	.LFE64-.LFB64
+ 455 011b 01       		.uleb128 0x1
+ 456 011c 9C       		.byte	0x9c
+ 457 011d 2F010000 		.4byte	0x12f
+ 458 0121 0C       		.uleb128 0xc
+ 459 0122 39020000 		.4byte	.LASF35
+ 460 0126 01       		.byte	0x1
+ 461 0127 39       		.byte	0x39
+ 462 0128 81000000 		.4byte	0x81
+ 463 012c 01       		.uleb128 0x1
+ 464 012d 50       		.byte	0x50
+ 465 012e 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 11
+
+
+ 466 012f 0D       		.uleb128 0xd
+ 467 0130 47010000 		.4byte	.LASF36
+ 468 0134 01       		.byte	0x1
+ 469 0135 43       		.byte	0x43
+ 470 0136 68000000 		.4byte	0x68
+ 471 013a 00000000 		.4byte	.LFB65
+ 472 013e 34000000 		.4byte	.LFE65-.LFB65
+ 473 0142 01       		.uleb128 0x1
+ 474 0143 9C       		.byte	0x9c
+ 475 0144 84010000 		.4byte	0x184
+ 476 0148 07       		.uleb128 0x7
+ 477 0149 0E000000 		.4byte	.LBB4
+ 478 014d 26000000 		.4byte	.LBE4-.LBB4
+ 479 0151 63010000 		.4byte	0x163
+ 480 0155 08       		.uleb128 0x8
+ 481 0156 6900     		.ascii	"i\000"
+ 482 0158 01       		.byte	0x1
+ 483 0159 4F       		.byte	0x4f
+ 484 015a 81000000 		.4byte	0x81
+ 485 015e 5D000000 		.4byte	.LLST2
+ 486 0162 00       		.byte	0
+ 487 0163 0E       		.uleb128 0xe
+ 488 0164 0A000000 		.4byte	.LVL11
+ 489 0168 57020000 		.4byte	0x257
+ 490 016c 7A010000 		.4byte	0x17a
+ 491 0170 0F       		.uleb128 0xf
+ 492 0171 01       		.uleb128 0x1
+ 493 0172 50       		.byte	0x50
+ 494 0173 05       		.uleb128 0x5
+ 495 0174 03       		.byte	0x3
+ 496 0175 00000000 		.4byte	handler
+ 497 0179 00       		.byte	0
+ 498 017a 0B       		.uleb128 0xb
+ 499 017b 0E000000 		.4byte	.LVL12
+ 500 017f 62020000 		.4byte	0x262
+ 501 0183 00       		.byte	0
+ 502 0184 10       		.uleb128 0x10
+ 503 0185 60000000 		.4byte	.LASF20
+ 504 0189 01       		.byte	0x1
+ 505 018a 5B       		.byte	0x5b
+ 506 018b 00000000 		.4byte	.LFB66
+ 507 018f 02000000 		.4byte	.LFE66-.LFB66
+ 508 0193 01       		.uleb128 0x1
+ 509 0194 9C       		.byte	0x9c
+ 510 0195 10       		.uleb128 0x10
+ 511 0196 A3010000 		.4byte	.LASF21
+ 512 019a 01       		.byte	0x1
+ 513 019b 5F       		.byte	0x5f
+ 514 019c 00000000 		.4byte	.LFB67
+ 515 01a0 02000000 		.4byte	.LFE67-.LFB67
+ 516 01a4 01       		.uleb128 0x1
+ 517 01a5 9C       		.byte	0x9c
+ 518 01a6 10       		.uleb128 0x10
+ 519 01a7 2A010000 		.4byte	.LASF22
+ 520 01ab 01       		.byte	0x1
+ 521 01ac 62       		.byte	0x62
+ 522 01ad 00000000 		.4byte	.LFB68
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 12
+
+
+ 523 01b1 02000000 		.4byte	.LFE68-.LFB68
+ 524 01b5 01       		.uleb128 0x1
+ 525 01b6 9C       		.byte	0x9c
+ 526 01b7 10       		.uleb128 0x10
+ 527 01b8 00000000 		.4byte	.LASF23
+ 528 01bc 01       		.byte	0x1
+ 529 01bd 65       		.byte	0x65
+ 530 01be 00000000 		.4byte	.LFB69
+ 531 01c2 02000000 		.4byte	.LFE69-.LFB69
+ 532 01c6 01       		.uleb128 0x1
+ 533 01c7 9C       		.byte	0x9c
+ 534 01c8 11       		.uleb128 0x11
+ 535 01c9 33010000 		.4byte	.LASF24
+ 536 01cd 05       		.byte	0x5
+ 537 01ce 1207     		.2byte	0x712
+ 538 01d0 D4010000 		.4byte	0x1d4
+ 539 01d4 12       		.uleb128 0x12
+ 540 01d5 76000000 		.4byte	0x76
+ 541 01d9 13       		.uleb128 0x13
+ 542 01da 81000000 		.4byte	0x81
+ 543 01de EF010000 		.4byte	0x1ef
+ 544 01e2 14       		.uleb128 0x14
+ 545 01e3 A9000000 		.4byte	0xa9
+ 546 01e7 05       		.byte	0x5
+ 547 01e8 14       		.uleb128 0x14
+ 548 01e9 A9000000 		.4byte	0xa9
+ 549 01ed 02       		.byte	0x2
+ 550 01ee 00       		.byte	0
+ 551 01ef 15       		.uleb128 0x15
+ 552 01f0 86010000 		.4byte	.LASF25
+ 553 01f4 01       		.byte	0x1
+ 554 01f5 14       		.byte	0x14
+ 555 01f6 D9010000 		.4byte	0x1d9
+ 556 01fa 05       		.uleb128 0x5
+ 557 01fb 03       		.byte	0x3
+ 558 01fc 00000000 		.4byte	scheduler
+ 559 0200 15       		.uleb128 0x15
+ 560 0201 58000000 		.4byte	.LASF26
+ 561 0205 01       		.byte	0x1
+ 562 0206 1D       		.byte	0x1d
+ 563 0207 81000000 		.4byte	0x81
+ 564 020b 05       		.uleb128 0x5
+ 565 020c 03       		.byte	0x3
+ 566 020d 00000000 		.4byte	counter
+ 567 0211 13       		.uleb128 0x13
+ 568 0212 81000000 		.4byte	0x81
+ 569 0216 21020000 		.4byte	0x221
+ 570 021a 14       		.uleb128 0x14
+ 571 021b A9000000 		.4byte	0xa9
+ 572 021f 02       		.byte	0x2
+ 573 0220 00       		.byte	0
+ 574 0221 15       		.uleb128 0x15
+ 575 0222 9D010000 		.4byte	.LASF27
+ 576 0226 01       		.byte	0x1
+ 577 0227 1F       		.byte	0x1f
+ 578 0228 11020000 		.4byte	0x211
+ 579 022c 05       		.uleb128 0x5
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 13
+
+
+ 580 022d 03       		.byte	0x3
+ 581 022e 00000000 		.4byte	flags
+ 582 0232 16       		.uleb128 0x16
+ 583 0233 6300     		.ascii	"c\000"
+ 584 0235 01       		.byte	0x1
+ 585 0236 21       		.byte	0x21
+ 586 0237 68000000 		.4byte	0x68
+ 587 023b 05       		.uleb128 0x5
+ 588 023c 03       		.byte	0x3
+ 589 023d 00000000 		.4byte	c
+ 590 0241 17       		.uleb128 0x17
+ 591 0242 FE010000 		.4byte	.LASF28
+ 592 0246 FE010000 		.4byte	.LASF28
+ 593 024a 06       		.byte	0x6
+ 594 024b 26       		.byte	0x26
+ 595 024c 17       		.uleb128 0x17
+ 596 024d 1F000000 		.4byte	.LASF29
+ 597 0251 1F000000 		.4byte	.LASF29
+ 598 0255 07       		.byte	0x7
+ 599 0256 5E       		.byte	0x5e
+ 600 0257 17       		.uleb128 0x17
+ 601 0258 40000000 		.4byte	.LASF30
+ 602 025c 40000000 		.4byte	.LASF30
+ 603 0260 08       		.byte	0x8
+ 604 0261 18       		.byte	0x18
+ 605 0262 17       		.uleb128 0x17
+ 606 0263 7A010000 		.4byte	.LASF31
+ 607 0267 7A010000 		.4byte	.LASF31
+ 608 026b 07       		.byte	0x7
+ 609 026c 5A       		.byte	0x5a
+ 610 026d 00       		.byte	0
+ 611              		.section	.debug_abbrev,"",%progbits
+ 612              	.Ldebug_abbrev0:
+ 613 0000 01       		.uleb128 0x1
+ 614 0001 11       		.uleb128 0x11
+ 615 0002 01       		.byte	0x1
+ 616 0003 25       		.uleb128 0x25
+ 617 0004 0E       		.uleb128 0xe
+ 618 0005 13       		.uleb128 0x13
+ 619 0006 0B       		.uleb128 0xb
+ 620 0007 03       		.uleb128 0x3
+ 621 0008 0E       		.uleb128 0xe
+ 622 0009 1B       		.uleb128 0x1b
+ 623 000a 0E       		.uleb128 0xe
+ 624 000b 55       		.uleb128 0x55
+ 625 000c 17       		.uleb128 0x17
+ 626 000d 11       		.uleb128 0x11
+ 627 000e 01       		.uleb128 0x1
+ 628 000f 10       		.uleb128 0x10
+ 629 0010 17       		.uleb128 0x17
+ 630 0011 00       		.byte	0
+ 631 0012 00       		.byte	0
+ 632 0013 02       		.uleb128 0x2
+ 633 0014 24       		.uleb128 0x24
+ 634 0015 00       		.byte	0
+ 635 0016 0B       		.uleb128 0xb
+ 636 0017 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 14
+
+
+ 637 0018 3E       		.uleb128 0x3e
+ 638 0019 0B       		.uleb128 0xb
+ 639 001a 03       		.uleb128 0x3
+ 640 001b 0E       		.uleb128 0xe
+ 641 001c 00       		.byte	0
+ 642 001d 00       		.byte	0
+ 643 001e 03       		.uleb128 0x3
+ 644 001f 16       		.uleb128 0x16
+ 645 0020 00       		.byte	0
+ 646 0021 03       		.uleb128 0x3
+ 647 0022 0E       		.uleb128 0xe
+ 648 0023 3A       		.uleb128 0x3a
+ 649 0024 0B       		.uleb128 0xb
+ 650 0025 3B       		.uleb128 0x3b
+ 651 0026 0B       		.uleb128 0xb
+ 652 0027 49       		.uleb128 0x49
+ 653 0028 13       		.uleb128 0x13
+ 654 0029 00       		.byte	0
+ 655 002a 00       		.byte	0
+ 656 002b 04       		.uleb128 0x4
+ 657 002c 24       		.uleb128 0x24
+ 658 002d 00       		.byte	0
+ 659 002e 0B       		.uleb128 0xb
+ 660 002f 0B       		.uleb128 0xb
+ 661 0030 3E       		.uleb128 0x3e
+ 662 0031 0B       		.uleb128 0xb
+ 663 0032 03       		.uleb128 0x3
+ 664 0033 08       		.uleb128 0x8
+ 665 0034 00       		.byte	0
+ 666 0035 00       		.byte	0
+ 667 0036 05       		.uleb128 0x5
+ 668 0037 16       		.uleb128 0x16
+ 669 0038 00       		.byte	0
+ 670 0039 03       		.uleb128 0x3
+ 671 003a 0E       		.uleb128 0xe
+ 672 003b 3A       		.uleb128 0x3a
+ 673 003c 0B       		.uleb128 0xb
+ 674 003d 3B       		.uleb128 0x3b
+ 675 003e 05       		.uleb128 0x5
+ 676 003f 49       		.uleb128 0x49
+ 677 0040 13       		.uleb128 0x13
+ 678 0041 00       		.byte	0
+ 679 0042 00       		.byte	0
+ 680 0043 06       		.uleb128 0x6
+ 681 0044 2E       		.uleb128 0x2e
+ 682 0045 01       		.byte	0x1
+ 683 0046 3F       		.uleb128 0x3f
+ 684 0047 19       		.uleb128 0x19
+ 685 0048 03       		.uleb128 0x3
+ 686 0049 0E       		.uleb128 0xe
+ 687 004a 3A       		.uleb128 0x3a
+ 688 004b 0B       		.uleb128 0xb
+ 689 004c 3B       		.uleb128 0x3b
+ 690 004d 0B       		.uleb128 0xb
+ 691 004e 27       		.uleb128 0x27
+ 692 004f 19       		.uleb128 0x19
+ 693 0050 11       		.uleb128 0x11
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 15
+
+
+ 694 0051 01       		.uleb128 0x1
+ 695 0052 12       		.uleb128 0x12
+ 696 0053 06       		.uleb128 0x6
+ 697 0054 40       		.uleb128 0x40
+ 698 0055 18       		.uleb128 0x18
+ 699 0056 9742     		.uleb128 0x2117
+ 700 0058 19       		.uleb128 0x19
+ 701 0059 01       		.uleb128 0x1
+ 702 005a 13       		.uleb128 0x13
+ 703 005b 00       		.byte	0
+ 704 005c 00       		.byte	0
+ 705 005d 07       		.uleb128 0x7
+ 706 005e 0B       		.uleb128 0xb
+ 707 005f 01       		.byte	0x1
+ 708 0060 11       		.uleb128 0x11
+ 709 0061 01       		.uleb128 0x1
+ 710 0062 12       		.uleb128 0x12
+ 711 0063 06       		.uleb128 0x6
+ 712 0064 01       		.uleb128 0x1
+ 713 0065 13       		.uleb128 0x13
+ 714 0066 00       		.byte	0
+ 715 0067 00       		.byte	0
+ 716 0068 08       		.uleb128 0x8
+ 717 0069 34       		.uleb128 0x34
+ 718 006a 00       		.byte	0
+ 719 006b 03       		.uleb128 0x3
+ 720 006c 08       		.uleb128 0x8
+ 721 006d 3A       		.uleb128 0x3a
+ 722 006e 0B       		.uleb128 0xb
+ 723 006f 3B       		.uleb128 0x3b
+ 724 0070 0B       		.uleb128 0xb
+ 725 0071 49       		.uleb128 0x49
+ 726 0072 13       		.uleb128 0x13
+ 727 0073 02       		.uleb128 0x2
+ 728 0074 17       		.uleb128 0x17
+ 729 0075 00       		.byte	0
+ 730 0076 00       		.byte	0
+ 731 0077 09       		.uleb128 0x9
+ 732 0078 0B       		.uleb128 0xb
+ 733 0079 01       		.byte	0x1
+ 734 007a 11       		.uleb128 0x11
+ 735 007b 01       		.uleb128 0x1
+ 736 007c 12       		.uleb128 0x12
+ 737 007d 06       		.uleb128 0x6
+ 738 007e 00       		.byte	0
+ 739 007f 00       		.byte	0
+ 740 0080 0A       		.uleb128 0xa
+ 741 0081 34       		.uleb128 0x34
+ 742 0082 00       		.byte	0
+ 743 0083 03       		.uleb128 0x3
+ 744 0084 0E       		.uleb128 0xe
+ 745 0085 3A       		.uleb128 0x3a
+ 746 0086 0B       		.uleb128 0xb
+ 747 0087 3B       		.uleb128 0x3b
+ 748 0088 0B       		.uleb128 0xb
+ 749 0089 49       		.uleb128 0x49
+ 750 008a 13       		.uleb128 0x13
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 16
+
+
+ 751 008b 02       		.uleb128 0x2
+ 752 008c 17       		.uleb128 0x17
+ 753 008d 00       		.byte	0
+ 754 008e 00       		.byte	0
+ 755 008f 0B       		.uleb128 0xb
+ 756 0090 898201   		.uleb128 0x4109
+ 757 0093 00       		.byte	0
+ 758 0094 11       		.uleb128 0x11
+ 759 0095 01       		.uleb128 0x1
+ 760 0096 31       		.uleb128 0x31
+ 761 0097 13       		.uleb128 0x13
+ 762 0098 00       		.byte	0
+ 763 0099 00       		.byte	0
+ 764 009a 0C       		.uleb128 0xc
+ 765 009b 05       		.uleb128 0x5
+ 766 009c 00       		.byte	0
+ 767 009d 03       		.uleb128 0x3
+ 768 009e 0E       		.uleb128 0xe
+ 769 009f 3A       		.uleb128 0x3a
+ 770 00a0 0B       		.uleb128 0xb
+ 771 00a1 3B       		.uleb128 0x3b
+ 772 00a2 0B       		.uleb128 0xb
+ 773 00a3 49       		.uleb128 0x49
+ 774 00a4 13       		.uleb128 0x13
+ 775 00a5 02       		.uleb128 0x2
+ 776 00a6 18       		.uleb128 0x18
+ 777 00a7 00       		.byte	0
+ 778 00a8 00       		.byte	0
+ 779 00a9 0D       		.uleb128 0xd
+ 780 00aa 2E       		.uleb128 0x2e
+ 781 00ab 01       		.byte	0x1
+ 782 00ac 3F       		.uleb128 0x3f
+ 783 00ad 19       		.uleb128 0x19
+ 784 00ae 03       		.uleb128 0x3
+ 785 00af 0E       		.uleb128 0xe
+ 786 00b0 3A       		.uleb128 0x3a
+ 787 00b1 0B       		.uleb128 0xb
+ 788 00b2 3B       		.uleb128 0x3b
+ 789 00b3 0B       		.uleb128 0xb
+ 790 00b4 27       		.uleb128 0x27
+ 791 00b5 19       		.uleb128 0x19
+ 792 00b6 49       		.uleb128 0x49
+ 793 00b7 13       		.uleb128 0x13
+ 794 00b8 8701     		.uleb128 0x87
+ 795 00ba 19       		.uleb128 0x19
+ 796 00bb 11       		.uleb128 0x11
+ 797 00bc 01       		.uleb128 0x1
+ 798 00bd 12       		.uleb128 0x12
+ 799 00be 06       		.uleb128 0x6
+ 800 00bf 40       		.uleb128 0x40
+ 801 00c0 18       		.uleb128 0x18
+ 802 00c1 9742     		.uleb128 0x2117
+ 803 00c3 19       		.uleb128 0x19
+ 804 00c4 01       		.uleb128 0x1
+ 805 00c5 13       		.uleb128 0x13
+ 806 00c6 00       		.byte	0
+ 807 00c7 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 17
+
+
+ 808 00c8 0E       		.uleb128 0xe
+ 809 00c9 898201   		.uleb128 0x4109
+ 810 00cc 01       		.byte	0x1
+ 811 00cd 11       		.uleb128 0x11
+ 812 00ce 01       		.uleb128 0x1
+ 813 00cf 31       		.uleb128 0x31
+ 814 00d0 13       		.uleb128 0x13
+ 815 00d1 01       		.uleb128 0x1
+ 816 00d2 13       		.uleb128 0x13
+ 817 00d3 00       		.byte	0
+ 818 00d4 00       		.byte	0
+ 819 00d5 0F       		.uleb128 0xf
+ 820 00d6 8A8201   		.uleb128 0x410a
+ 821 00d9 00       		.byte	0
+ 822 00da 02       		.uleb128 0x2
+ 823 00db 18       		.uleb128 0x18
+ 824 00dc 9142     		.uleb128 0x2111
+ 825 00de 18       		.uleb128 0x18
+ 826 00df 00       		.byte	0
+ 827 00e0 00       		.byte	0
+ 828 00e1 10       		.uleb128 0x10
+ 829 00e2 2E       		.uleb128 0x2e
+ 830 00e3 00       		.byte	0
+ 831 00e4 3F       		.uleb128 0x3f
+ 832 00e5 19       		.uleb128 0x19
+ 833 00e6 03       		.uleb128 0x3
+ 834 00e7 0E       		.uleb128 0xe
+ 835 00e8 3A       		.uleb128 0x3a
+ 836 00e9 0B       		.uleb128 0xb
+ 837 00ea 3B       		.uleb128 0x3b
+ 838 00eb 0B       		.uleb128 0xb
+ 839 00ec 11       		.uleb128 0x11
+ 840 00ed 01       		.uleb128 0x1
+ 841 00ee 12       		.uleb128 0x12
+ 842 00ef 06       		.uleb128 0x6
+ 843 00f0 40       		.uleb128 0x40
+ 844 00f1 18       		.uleb128 0x18
+ 845 00f2 9742     		.uleb128 0x2117
+ 846 00f4 19       		.uleb128 0x19
+ 847 00f5 00       		.byte	0
+ 848 00f6 00       		.byte	0
+ 849 00f7 11       		.uleb128 0x11
+ 850 00f8 34       		.uleb128 0x34
+ 851 00f9 00       		.byte	0
+ 852 00fa 03       		.uleb128 0x3
+ 853 00fb 0E       		.uleb128 0xe
+ 854 00fc 3A       		.uleb128 0x3a
+ 855 00fd 0B       		.uleb128 0xb
+ 856 00fe 3B       		.uleb128 0x3b
+ 857 00ff 05       		.uleb128 0x5
+ 858 0100 49       		.uleb128 0x49
+ 859 0101 13       		.uleb128 0x13
+ 860 0102 3F       		.uleb128 0x3f
+ 861 0103 19       		.uleb128 0x19
+ 862 0104 3C       		.uleb128 0x3c
+ 863 0105 19       		.uleb128 0x19
+ 864 0106 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 18
+
+
+ 865 0107 00       		.byte	0
+ 866 0108 12       		.uleb128 0x12
+ 867 0109 35       		.uleb128 0x35
+ 868 010a 00       		.byte	0
+ 869 010b 49       		.uleb128 0x49
+ 870 010c 13       		.uleb128 0x13
+ 871 010d 00       		.byte	0
+ 872 010e 00       		.byte	0
+ 873 010f 13       		.uleb128 0x13
+ 874 0110 01       		.uleb128 0x1
+ 875 0111 01       		.byte	0x1
+ 876 0112 49       		.uleb128 0x49
+ 877 0113 13       		.uleb128 0x13
+ 878 0114 01       		.uleb128 0x1
+ 879 0115 13       		.uleb128 0x13
+ 880 0116 00       		.byte	0
+ 881 0117 00       		.byte	0
+ 882 0118 14       		.uleb128 0x14
+ 883 0119 21       		.uleb128 0x21
+ 884 011a 00       		.byte	0
+ 885 011b 49       		.uleb128 0x49
+ 886 011c 13       		.uleb128 0x13
+ 887 011d 2F       		.uleb128 0x2f
+ 888 011e 0B       		.uleb128 0xb
+ 889 011f 00       		.byte	0
+ 890 0120 00       		.byte	0
+ 891 0121 15       		.uleb128 0x15
+ 892 0122 34       		.uleb128 0x34
+ 893 0123 00       		.byte	0
+ 894 0124 03       		.uleb128 0x3
+ 895 0125 0E       		.uleb128 0xe
+ 896 0126 3A       		.uleb128 0x3a
+ 897 0127 0B       		.uleb128 0xb
+ 898 0128 3B       		.uleb128 0x3b
+ 899 0129 0B       		.uleb128 0xb
+ 900 012a 49       		.uleb128 0x49
+ 901 012b 13       		.uleb128 0x13
+ 902 012c 3F       		.uleb128 0x3f
+ 903 012d 19       		.uleb128 0x19
+ 904 012e 02       		.uleb128 0x2
+ 905 012f 18       		.uleb128 0x18
+ 906 0130 00       		.byte	0
+ 907 0131 00       		.byte	0
+ 908 0132 16       		.uleb128 0x16
+ 909 0133 34       		.uleb128 0x34
+ 910 0134 00       		.byte	0
+ 911 0135 03       		.uleb128 0x3
+ 912 0136 08       		.uleb128 0x8
+ 913 0137 3A       		.uleb128 0x3a
+ 914 0138 0B       		.uleb128 0xb
+ 915 0139 3B       		.uleb128 0x3b
+ 916 013a 0B       		.uleb128 0xb
+ 917 013b 49       		.uleb128 0x49
+ 918 013c 13       		.uleb128 0x13
+ 919 013d 3F       		.uleb128 0x3f
+ 920 013e 19       		.uleb128 0x19
+ 921 013f 02       		.uleb128 0x2
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 19
+
+
+ 922 0140 18       		.uleb128 0x18
+ 923 0141 00       		.byte	0
+ 924 0142 00       		.byte	0
+ 925 0143 17       		.uleb128 0x17
+ 926 0144 2E       		.uleb128 0x2e
+ 927 0145 00       		.byte	0
+ 928 0146 3F       		.uleb128 0x3f
+ 929 0147 19       		.uleb128 0x19
+ 930 0148 3C       		.uleb128 0x3c
+ 931 0149 19       		.uleb128 0x19
+ 932 014a 6E       		.uleb128 0x6e
+ 933 014b 0E       		.uleb128 0xe
+ 934 014c 03       		.uleb128 0x3
+ 935 014d 0E       		.uleb128 0xe
+ 936 014e 3A       		.uleb128 0x3a
+ 937 014f 0B       		.uleb128 0xb
+ 938 0150 3B       		.uleb128 0x3b
+ 939 0151 0B       		.uleb128 0xb
+ 940 0152 00       		.byte	0
+ 941 0153 00       		.byte	0
+ 942 0154 00       		.byte	0
+ 943              		.section	.debug_loc,"",%progbits
+ 944              	.Ldebug_loc0:
+ 945              	.LLST0:
+ 946 0000 1E000000 		.4byte	.LVL0
+ 947 0004 22000000 		.4byte	.LVL1
+ 948 0008 0200     		.2byte	0x2
+ 949 000a 30       		.byte	0x30
+ 950 000b 9F       		.byte	0x9f
+ 951 000c 22000000 		.4byte	.LVL1
+ 952 0010 38000000 		.4byte	.LVL5
+ 953 0014 0100     		.2byte	0x1
+ 954 0016 53       		.byte	0x53
+ 955 0017 3A000000 		.4byte	.LVL6
+ 956 001b 40000000 		.4byte	.LVL7
+ 957 001f 0100     		.2byte	0x1
+ 958 0021 53       		.byte	0x53
+ 959 0022 00000000 		.4byte	0
+ 960 0026 00000000 		.4byte	0
+ 961              	.LLST1:
+ 962 002a 2C000000 		.4byte	.LVL2
+ 963 002e 2E000000 		.4byte	.LVL3
+ 964 0032 0100     		.2byte	0x1
+ 965 0034 51       		.byte	0x51
+ 966 0035 2E000000 		.4byte	.LVL3
+ 967 0039 32000000 		.4byte	.LVL4
+ 968 003d 0300     		.2byte	0x3
+ 969 003f 71       		.byte	0x71
+ 970 0040 01       		.sleb128 1
+ 971 0041 9F       		.byte	0x9f
+ 972 0042 32000000 		.4byte	.LVL4
+ 973 0046 3A000000 		.4byte	.LVL6
+ 974 004a 0900     		.2byte	0x9
+ 975 004c 71       		.byte	0x71
+ 976 004d 00       		.sleb128 0
+ 977 004e 03       		.byte	0x3
+ 978 004f FFFFFFFF 		.4byte	.LANCHOR0-1
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 20
+
+
+ 979 0053 1C       		.byte	0x1c
+ 980 0054 9F       		.byte	0x9f
+ 981 0055 00000000 		.4byte	0
+ 982 0059 00000000 		.4byte	0
+ 983              	.LLST2:
+ 984 005d 0E000000 		.4byte	.LVL12
+ 985 0061 12000000 		.4byte	.LVL13
+ 986 0065 0200     		.2byte	0x2
+ 987 0067 30       		.byte	0x30
+ 988 0068 9F       		.byte	0x9f
+ 989 0069 12000000 		.4byte	.LVL13
+ 990 006d 24000000 		.4byte	.LVL14
+ 991 0071 0100     		.2byte	0x1
+ 992 0073 53       		.byte	0x53
+ 993 0074 26000000 		.4byte	.LVL15
+ 994 0078 34000000 		.4byte	.LFE65
+ 995 007c 0100     		.2byte	0x1
+ 996 007e 53       		.byte	0x53
+ 997 007f 00000000 		.4byte	0
+ 998 0083 00000000 		.4byte	0
+ 999              		.section	.debug_aranges,"",%progbits
+ 1000 0000 4C000000 		.4byte	0x4c
+ 1001 0004 0200     		.2byte	0x2
+ 1002 0006 00000000 		.4byte	.Ldebug_info0
+ 1003 000a 04       		.byte	0x4
+ 1004 000b 00       		.byte	0
+ 1005 000c 0000     		.2byte	0
+ 1006 000e 0000     		.2byte	0
+ 1007 0010 00000000 		.4byte	.LFB63
+ 1008 0014 6C000000 		.4byte	.LFE63-.LFB63
+ 1009 0018 00000000 		.4byte	.LFB64
+ 1010 001c 02000000 		.4byte	.LFE64-.LFB64
+ 1011 0020 00000000 		.4byte	.LFB65
+ 1012 0024 34000000 		.4byte	.LFE65-.LFB65
+ 1013 0028 00000000 		.4byte	.LFB66
+ 1014 002c 02000000 		.4byte	.LFE66-.LFB66
+ 1015 0030 00000000 		.4byte	.LFB67
+ 1016 0034 02000000 		.4byte	.LFE67-.LFB67
+ 1017 0038 00000000 		.4byte	.LFB68
+ 1018 003c 02000000 		.4byte	.LFE68-.LFB68
+ 1019 0040 00000000 		.4byte	.LFB69
+ 1020 0044 02000000 		.4byte	.LFE69-.LFB69
+ 1021 0048 00000000 		.4byte	0
+ 1022 004c 00000000 		.4byte	0
+ 1023              		.section	.debug_ranges,"",%progbits
+ 1024              	.Ldebug_ranges0:
+ 1025 0000 00000000 		.4byte	.LFB63
+ 1026 0004 6C000000 		.4byte	.LFE63
+ 1027 0008 00000000 		.4byte	.LFB64
+ 1028 000c 02000000 		.4byte	.LFE64
+ 1029 0010 00000000 		.4byte	.LFB65
+ 1030 0014 34000000 		.4byte	.LFE65
+ 1031 0018 00000000 		.4byte	.LFB66
+ 1032 001c 02000000 		.4byte	.LFE66
+ 1033 0020 00000000 		.4byte	.LFB67
+ 1034 0024 02000000 		.4byte	.LFE67
+ 1035 0028 00000000 		.4byte	.LFB68
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 21
+
+
+ 1036 002c 02000000 		.4byte	.LFE68
+ 1037 0030 00000000 		.4byte	.LFB69
+ 1038 0034 02000000 		.4byte	.LFE69
+ 1039 0038 00000000 		.4byte	0
+ 1040 003c 00000000 		.4byte	0
+ 1041              		.section	.debug_line,"",%progbits
+ 1042              	.Ldebug_line0:
+ 1043 0000 F4010000 		.section	.debug_str,"MS",%progbits,1
+ 1043      02004B01 
+ 1043      00000201 
+ 1043      FB0E0D00 
+ 1043      01010101 
+ 1044              	.LASF23:
+ 1045 0000 6576656E 		.ascii	"event_sw1_task\000"
+ 1045      745F7377 
+ 1045      315F7461 
+ 1045      736B00
+ 1046              	.LASF17:
+ 1047 000f 76616C75 		.ascii	"value\000"
+ 1047      6500
+ 1048              	.LASF9:
+ 1049 0015 5F5F696E 		.ascii	"__int32_t\000"
+ 1049      7433325F 
+ 1049      7400
+ 1050              	.LASF29:
+ 1051 001f 54696D65 		.ascii	"Timer_ReadStatusRegister\000"
+ 1051      725F5265 
+ 1051      61645374 
+ 1051      61747573 
+ 1051      52656769 
+ 1052              	.LASF10:
+ 1053 0038 696E7433 		.ascii	"int32_t\000"
+ 1053      325F7400 
+ 1054              	.LASF30:
+ 1055 0040 6973725F 		.ascii	"isr_timer_StartEx\000"
+ 1055      74696D65 
+ 1055      725F5374 
+ 1055      61727445 
+ 1055      7800
+ 1056              	.LASF12:
+ 1057 0052 666C6F61 		.ascii	"float\000"
+ 1057      7400
+ 1058              	.LASF26:
+ 1059 0058 636F756E 		.ascii	"counter\000"
+ 1059      74657200 
+ 1060              	.LASF20:
+ 1061 0060 6164635F 		.ascii	"adc_task\000"
+ 1061      7461736B 
+ 1061      00
+ 1062              	.LASF1:
+ 1063 0069 756E7369 		.ascii	"unsigned char\000"
+ 1063      676E6564 
+ 1063      20636861 
+ 1063      7200
+ 1064              	.LASF32:
+ 1065 0077 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1065      43313120 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 22
+
+
+ 1065      352E342E 
+ 1065      31203230 
+ 1065      31363036 
+ 1066 00aa 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1066      20726576 
+ 1066      6973696F 
+ 1066      6E203233 
+ 1066      37373135 
+ 1067 00dd 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1067      66756E63 
+ 1067      74696F6E 
+ 1067      2D736563 
+ 1067      74696F6E 
+ 1068              	.LASF5:
+ 1069 0105 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1069      20756E73 
+ 1069      69676E65 
+ 1069      6420696E 
+ 1069      7400
+ 1070              	.LASF3:
+ 1071 0117 73686F72 		.ascii	"short unsigned int\000"
+ 1071      7420756E 
+ 1071      7369676E 
+ 1071      65642069 
+ 1071      6E7400
+ 1072              	.LASF22:
+ 1073 012a 6C63645F 		.ascii	"lcd_task\000"
+ 1073      7461736B 
+ 1073      00
+ 1074              	.LASF24:
+ 1075 0133 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1075      52784275 
+ 1075      66666572 
+ 1075      00
+ 1076              	.LASF13:
+ 1077 0140 646F7562 		.ascii	"double\000"
+ 1077      6C6500
+ 1078              	.LASF36:
+ 1079 0147 6D61696E 		.ascii	"main\000"
+ 1079      00
+ 1080              	.LASF34:
+ 1081 014c 443A5C4E 		.ascii	"D:\\Notes 202324\\ELECH410\\Labs\\Lab2\\Lab2.cydsn\000"
+ 1081      6F746573 
+ 1081      20323032 
+ 1081      3332345C 
+ 1081      454C4543 
+ 1082              	.LASF31:
+ 1083 017a 54696D65 		.ascii	"Timer_Start\000"
+ 1083      725F5374 
+ 1083      61727400 
+ 1084              	.LASF25:
+ 1085 0186 73636865 		.ascii	"scheduler\000"
+ 1085      64756C65 
+ 1085      7200
+ 1086              	.LASF8:
+ 1087 0190 756E7369 		.ascii	"unsigned int\000"
+ 1087      676E6564 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 23
+
+
+ 1087      20696E74 
+ 1087      00
+ 1088              	.LASF27:
+ 1089 019d 666C6167 		.ascii	"flags\000"
+ 1089      7300
+ 1090              	.LASF21:
+ 1091 01a3 6C65645F 		.ascii	"led_task\000"
+ 1091      7461736B 
+ 1091      00
+ 1092              	.LASF7:
+ 1093 01ac 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1093      206C6F6E 
+ 1093      6720756E 
+ 1093      7369676E 
+ 1093      65642069 
+ 1094              	.LASF18:
+ 1095 01c3 68616E64 		.ascii	"handler\000"
+ 1095      6C657200 
+ 1096              	.LASF16:
+ 1097 01cb 73697A65 		.ascii	"sizetype\000"
+ 1097      74797065 
+ 1097      00
+ 1098              	.LASF6:
+ 1099 01d4 6C6F6E67 		.ascii	"long long int\000"
+ 1099      206C6F6E 
+ 1099      6720696E 
+ 1099      7400
+ 1100              	.LASF33:
+ 1101 01e2 6D61696E 		.ascii	"main.c\000"
+ 1101      2E6300
+ 1102              	.LASF14:
+ 1103 01e9 63686172 		.ascii	"char\000"
+ 1103      00
+ 1104              	.LASF2:
+ 1105 01ee 73686F72 		.ascii	"short int\000"
+ 1105      7420696E 
+ 1105      7400
+ 1106              	.LASF11:
+ 1107 01f8 75696E74 		.ascii	"uint8\000"
+ 1107      3800
+ 1108              	.LASF28:
+ 1109 01fe 4750494F 		.ascii	"GPIOJ12_Write\000"
+ 1109      4A31325F 
+ 1109      57726974 
+ 1109      6500
+ 1110              	.LASF19:
+ 1111 020c 73656C65 		.ascii	"select_task\000"
+ 1111      63745F74 
+ 1111      61736B00 
+ 1112              	.LASF4:
+ 1113 0218 6C6F6E67 		.ascii	"long int\000"
+ 1113      20696E74 
+ 1113      00
+ 1114              	.LASF15:
+ 1115 0221 6C6F6E67 		.ascii	"long double\000"
+ 1115      20646F75 
+ 1115      626C6500 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccaMxdsr.s 			page 24
+
+
+ 1116              	.LASF0:
+ 1117 022d 7369676E 		.ascii	"signed char\000"
+ 1117      65642063 
+ 1117      68617200 
+ 1118              	.LASF35:
+ 1119 0239 6E626572 		.ascii	"nber\000"
+ 1119      00
+ 1120              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
