@@ -1,0 +1,9 @@
+**/Generated_Source/**
+*.log
+*.cyprj.*
+*.rpt
+*.svd
+*.cywrk.*
+*_timing.html
+**/codegentemp/**
+**/Export/**
