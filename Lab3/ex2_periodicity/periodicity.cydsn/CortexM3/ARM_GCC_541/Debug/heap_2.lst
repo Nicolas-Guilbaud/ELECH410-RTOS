@@ -1,0 +1,1997 @@
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"heap_2.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.prvHeapInit,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	prvHeapInit, %function
+  24              	prvHeapInit:
+  25              	.LFB9:
+  26              		.file 1 "FreeRTOS\\src\\heap_2.c"
+   1:FreeRTOS\src/heap_2.c **** /*
+   2:FreeRTOS\src/heap_2.c ****  * FreeRTOS Kernel V10.1.1
+   3:FreeRTOS\src/heap_2.c ****  * Copyright (C) 2018 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:FreeRTOS\src/heap_2.c ****  *
+   5:FreeRTOS\src/heap_2.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:FreeRTOS\src/heap_2.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:FreeRTOS\src/heap_2.c ****  * the Software without restriction, including without limitation the rights to
+   8:FreeRTOS\src/heap_2.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:FreeRTOS\src/heap_2.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:FreeRTOS\src/heap_2.c ****  * subject to the following conditions:
+  11:FreeRTOS\src/heap_2.c ****  *
+  12:FreeRTOS\src/heap_2.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:FreeRTOS\src/heap_2.c ****  * copies or substantial portions of the Software.
+  14:FreeRTOS\src/heap_2.c ****  *
+  15:FreeRTOS\src/heap_2.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:FreeRTOS\src/heap_2.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:FreeRTOS\src/heap_2.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:FreeRTOS\src/heap_2.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:FreeRTOS\src/heap_2.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:FreeRTOS\src/heap_2.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:FreeRTOS\src/heap_2.c ****  *
+  22:FreeRTOS\src/heap_2.c ****  * http://www.FreeRTOS.org
+  23:FreeRTOS\src/heap_2.c ****  * http://aws.amazon.com/freertos
+  24:FreeRTOS\src/heap_2.c ****  *
+  25:FreeRTOS\src/heap_2.c ****  * 1 tab == 4 spaces!
+  26:FreeRTOS\src/heap_2.c ****  */
+  27:FreeRTOS\src/heap_2.c **** 
+  28:FreeRTOS\src/heap_2.c **** /*
+  29:FreeRTOS\src/heap_2.c ****  * A sample implementation of pvPortMalloc() and vPortFree() that permits
+  30:FreeRTOS\src/heap_2.c ****  * allocated blocks to be freed, but does not combine adjacent free blocks
+  31:FreeRTOS\src/heap_2.c ****  * into a single larger block (and so will fragment memory).  See heap_4.c for
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 2
+
+
+  32:FreeRTOS\src/heap_2.c ****  * an equivalent that does combine adjacent blocks into single larger blocks.
+  33:FreeRTOS\src/heap_2.c ****  *
+  34:FreeRTOS\src/heap_2.c ****  * See heap_1.c, heap_3.c and heap_4.c for alternative implementations, and the
+  35:FreeRTOS\src/heap_2.c ****  * memory management pages of http://www.FreeRTOS.org for more information.
+  36:FreeRTOS\src/heap_2.c ****  */
+  37:FreeRTOS\src/heap_2.c **** #include <stdlib.h>
+  38:FreeRTOS\src/heap_2.c **** 
+  39:FreeRTOS\src/heap_2.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+  40:FreeRTOS\src/heap_2.c **** all the API functions to use the MPU wrappers.  That should only be done when
+  41:FreeRTOS\src/heap_2.c **** task.h is included from an application file. */
+  42:FreeRTOS\src/heap_2.c **** #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  43:FreeRTOS\src/heap_2.c **** 
+  44:FreeRTOS\src/heap_2.c **** #include "FreeRTOS.h"
+  45:FreeRTOS\src/heap_2.c **** #include "task.h"
+  46:FreeRTOS\src/heap_2.c **** 
+  47:FreeRTOS\src/heap_2.c **** #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  48:FreeRTOS\src/heap_2.c **** 
+  49:FreeRTOS\src/heap_2.c **** #if( configSUPPORT_DYNAMIC_ALLOCATION == 0 )
+  50:FreeRTOS\src/heap_2.c **** 	#error This file must not be used if configSUPPORT_DYNAMIC_ALLOCATION is 0
+  51:FreeRTOS\src/heap_2.c **** #endif
+  52:FreeRTOS\src/heap_2.c **** 
+  53:FreeRTOS\src/heap_2.c **** /* A few bytes might be lost to byte aligning the heap start address. */
+  54:FreeRTOS\src/heap_2.c **** #define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
+  55:FreeRTOS\src/heap_2.c **** 
+  56:FreeRTOS\src/heap_2.c **** /*
+  57:FreeRTOS\src/heap_2.c ****  * Initialises the heap structures before their first use.
+  58:FreeRTOS\src/heap_2.c ****  */
+  59:FreeRTOS\src/heap_2.c **** static void prvHeapInit( void );
+  60:FreeRTOS\src/heap_2.c **** 
+  61:FreeRTOS\src/heap_2.c **** /* Allocate the memory for the heap. */
+  62:FreeRTOS\src/heap_2.c **** #if( configAPPLICATION_ALLOCATED_HEAP == 1 )
+  63:FreeRTOS\src/heap_2.c **** 	/* The application writer has already defined the array used for the RTOS
+  64:FreeRTOS\src/heap_2.c **** 	heap - probably so it can be placed in a special segment or address. */
+  65:FreeRTOS\src/heap_2.c **** 	extern uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+  66:FreeRTOS\src/heap_2.c **** #else
+  67:FreeRTOS\src/heap_2.c **** 	static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+  68:FreeRTOS\src/heap_2.c **** #endif /* configAPPLICATION_ALLOCATED_HEAP */
+  69:FreeRTOS\src/heap_2.c **** 
+  70:FreeRTOS\src/heap_2.c **** 
+  71:FreeRTOS\src/heap_2.c **** /* Define the linked list structure.  This is used to link free blocks in order
+  72:FreeRTOS\src/heap_2.c **** of their size. */
+  73:FreeRTOS\src/heap_2.c **** typedef struct A_BLOCK_LINK
+  74:FreeRTOS\src/heap_2.c **** {
+  75:FreeRTOS\src/heap_2.c **** 	struct A_BLOCK_LINK *pxNextFreeBlock;	/*<< The next free block in the list. */
+  76:FreeRTOS\src/heap_2.c **** 	size_t xBlockSize;						/*<< The size of the free block. */
+  77:FreeRTOS\src/heap_2.c **** } BlockLink_t;
+  78:FreeRTOS\src/heap_2.c **** 
+  79:FreeRTOS\src/heap_2.c **** 
+  80:FreeRTOS\src/heap_2.c **** static const uint16_t heapSTRUCT_SIZE	= ( ( sizeof ( BlockLink_t ) + ( portBYTE_ALIGNMENT - 1 ) ) &
+  81:FreeRTOS\src/heap_2.c **** #define heapMINIMUM_BLOCK_SIZE	( ( size_t ) ( heapSTRUCT_SIZE * 2 ) )
+  82:FreeRTOS\src/heap_2.c **** 
+  83:FreeRTOS\src/heap_2.c **** /* Create a couple of list links to mark the start and end of the list. */
+  84:FreeRTOS\src/heap_2.c **** static BlockLink_t xStart, xEnd;
+  85:FreeRTOS\src/heap_2.c **** 
+  86:FreeRTOS\src/heap_2.c **** /* Keeps track of the number of free bytes remaining, but says nothing about
+  87:FreeRTOS\src/heap_2.c **** fragmentation. */
+  88:FreeRTOS\src/heap_2.c **** static size_t xFreeBytesRemaining = configADJUSTED_HEAP_SIZE;
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 3
+
+
+  89:FreeRTOS\src/heap_2.c **** 
+  90:FreeRTOS\src/heap_2.c **** /* STATIC FUNCTIONS ARE DEFINED AS MACROS TO MINIMIZE THE FUNCTION CALL DEPTH. */
+  91:FreeRTOS\src/heap_2.c **** 
+  92:FreeRTOS\src/heap_2.c **** /*
+  93:FreeRTOS\src/heap_2.c ****  * Insert a block into the list of free blocks - which is ordered by size of
+  94:FreeRTOS\src/heap_2.c ****  * the block.  Small blocks at the start of the list and large blocks at the end
+  95:FreeRTOS\src/heap_2.c ****  * of the list.
+  96:FreeRTOS\src/heap_2.c ****  */
+  97:FreeRTOS\src/heap_2.c **** #define prvInsertBlockIntoFreeList( pxBlockToInsert )								\
+  98:FreeRTOS\src/heap_2.c **** {																					\
+  99:FreeRTOS\src/heap_2.c **** BlockLink_t *pxIterator;															\
+ 100:FreeRTOS\src/heap_2.c **** size_t xBlockSize;																	\
+ 101:FreeRTOS\src/heap_2.c **** 																					\
+ 102:FreeRTOS\src/heap_2.c **** 	xBlockSize = pxBlockToInsert->xBlockSize;										\
+ 103:FreeRTOS\src/heap_2.c **** 																					\
+ 104:FreeRTOS\src/heap_2.c **** 	/* Iterate through the list until a block is found that has a larger size */	\
+ 105:FreeRTOS\src/heap_2.c **** 	/* than the block we are inserting. */											\
+ 106:FreeRTOS\src/heap_2.c **** 	for( pxIterator = &xStart; pxIterator->pxNextFreeBlock->xBlockSize < xBlockSize; pxIterator = pxIt
+ 107:FreeRTOS\src/heap_2.c **** 	{																				\
+ 108:FreeRTOS\src/heap_2.c **** 		/* There is nothing to do here - just iterate to the correct position. */	\
+ 109:FreeRTOS\src/heap_2.c **** 	}																				\
+ 110:FreeRTOS\src/heap_2.c **** 																					\
+ 111:FreeRTOS\src/heap_2.c **** 	/* Update the list to include the block being inserted in the correct */		\
+ 112:FreeRTOS\src/heap_2.c **** 	/* position. */																	\
+ 113:FreeRTOS\src/heap_2.c **** 	pxBlockToInsert->pxNextFreeBlock = pxIterator->pxNextFreeBlock;					\
+ 114:FreeRTOS\src/heap_2.c **** 	pxIterator->pxNextFreeBlock = pxBlockToInsert;									\
+ 115:FreeRTOS\src/heap_2.c **** }
+ 116:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 117:FreeRTOS\src/heap_2.c **** 
+ 118:FreeRTOS\src/heap_2.c **** void *pvPortMalloc( size_t xWantedSize )
+ 119:FreeRTOS\src/heap_2.c **** {
+ 120:FreeRTOS\src/heap_2.c **** BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
+ 121:FreeRTOS\src/heap_2.c **** static BaseType_t xHeapHasBeenInitialised = pdFALSE;
+ 122:FreeRTOS\src/heap_2.c **** void *pvReturn = NULL;
+ 123:FreeRTOS\src/heap_2.c **** 
+ 124:FreeRTOS\src/heap_2.c **** 	vTaskSuspendAll();
+ 125:FreeRTOS\src/heap_2.c **** 	{
+ 126:FreeRTOS\src/heap_2.c **** 		/* If this is the first call to malloc then the heap will require
+ 127:FreeRTOS\src/heap_2.c **** 		initialisation to setup the list of free blocks. */
+ 128:FreeRTOS\src/heap_2.c **** 		if( xHeapHasBeenInitialised == pdFALSE )
+ 129:FreeRTOS\src/heap_2.c **** 		{
+ 130:FreeRTOS\src/heap_2.c **** 			prvHeapInit();
+ 131:FreeRTOS\src/heap_2.c **** 			xHeapHasBeenInitialised = pdTRUE;
+ 132:FreeRTOS\src/heap_2.c **** 		}
+ 133:FreeRTOS\src/heap_2.c **** 
+ 134:FreeRTOS\src/heap_2.c **** 		/* The wanted size is increased so it can contain a BlockLink_t
+ 135:FreeRTOS\src/heap_2.c **** 		structure in addition to the requested amount of bytes. */
+ 136:FreeRTOS\src/heap_2.c **** 		if( xWantedSize > 0 )
+ 137:FreeRTOS\src/heap_2.c **** 		{
+ 138:FreeRTOS\src/heap_2.c **** 			xWantedSize += heapSTRUCT_SIZE;
+ 139:FreeRTOS\src/heap_2.c **** 
+ 140:FreeRTOS\src/heap_2.c **** 			/* Ensure that blocks are always aligned to the required number of bytes. */
+ 141:FreeRTOS\src/heap_2.c **** 			if( ( xWantedSize & portBYTE_ALIGNMENT_MASK ) != 0 )
+ 142:FreeRTOS\src/heap_2.c **** 			{
+ 143:FreeRTOS\src/heap_2.c **** 				/* Byte alignment required. */
+ 144:FreeRTOS\src/heap_2.c **** 				xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & portBYTE_ALIGNMENT_MASK ) );
+ 145:FreeRTOS\src/heap_2.c **** 			}
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 4
+
+
+ 146:FreeRTOS\src/heap_2.c **** 		}
+ 147:FreeRTOS\src/heap_2.c **** 
+ 148:FreeRTOS\src/heap_2.c **** 		if( ( xWantedSize > 0 ) && ( xWantedSize < configADJUSTED_HEAP_SIZE ) )
+ 149:FreeRTOS\src/heap_2.c **** 		{
+ 150:FreeRTOS\src/heap_2.c **** 			/* Blocks are stored in byte order - traverse the list from the start
+ 151:FreeRTOS\src/heap_2.c **** 			(smallest) block until one of adequate size is found. */
+ 152:FreeRTOS\src/heap_2.c **** 			pxPreviousBlock = &xStart;
+ 153:FreeRTOS\src/heap_2.c **** 			pxBlock = xStart.pxNextFreeBlock;
+ 154:FreeRTOS\src/heap_2.c **** 			while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock != NULL ) )
+ 155:FreeRTOS\src/heap_2.c **** 			{
+ 156:FreeRTOS\src/heap_2.c **** 				pxPreviousBlock = pxBlock;
+ 157:FreeRTOS\src/heap_2.c **** 				pxBlock = pxBlock->pxNextFreeBlock;
+ 158:FreeRTOS\src/heap_2.c **** 			}
+ 159:FreeRTOS\src/heap_2.c **** 
+ 160:FreeRTOS\src/heap_2.c **** 			/* If we found the end marker then a block of adequate size was not found. */
+ 161:FreeRTOS\src/heap_2.c **** 			if( pxBlock != &xEnd )
+ 162:FreeRTOS\src/heap_2.c **** 			{
+ 163:FreeRTOS\src/heap_2.c **** 				/* Return the memory space - jumping over the BlockLink_t structure
+ 164:FreeRTOS\src/heap_2.c **** 				at its start. */
+ 165:FreeRTOS\src/heap_2.c **** 				pvReturn = ( void * ) ( ( ( uint8_t * ) pxPreviousBlock->pxNextFreeBlock ) + heapSTRUCT_SIZE );
+ 166:FreeRTOS\src/heap_2.c **** 
+ 167:FreeRTOS\src/heap_2.c **** 				/* This block is being returned for use so must be taken out of the
+ 168:FreeRTOS\src/heap_2.c **** 				list of free blocks. */
+ 169:FreeRTOS\src/heap_2.c **** 				pxPreviousBlock->pxNextFreeBlock = pxBlock->pxNextFreeBlock;
+ 170:FreeRTOS\src/heap_2.c **** 
+ 171:FreeRTOS\src/heap_2.c **** 				/* If the block is larger than required it can be split into two. */
+ 172:FreeRTOS\src/heap_2.c **** 				if( ( pxBlock->xBlockSize - xWantedSize ) > heapMINIMUM_BLOCK_SIZE )
+ 173:FreeRTOS\src/heap_2.c **** 				{
+ 174:FreeRTOS\src/heap_2.c **** 					/* This block is to be split into two.  Create a new block
+ 175:FreeRTOS\src/heap_2.c **** 					following the number of bytes requested. The void cast is
+ 176:FreeRTOS\src/heap_2.c **** 					used to prevent byte alignment warnings from the compiler. */
+ 177:FreeRTOS\src/heap_2.c **** 					pxNewBlockLink = ( void * ) ( ( ( uint8_t * ) pxBlock ) + xWantedSize );
+ 178:FreeRTOS\src/heap_2.c **** 
+ 179:FreeRTOS\src/heap_2.c **** 					/* Calculate the sizes of two blocks split from the single
+ 180:FreeRTOS\src/heap_2.c **** 					block. */
+ 181:FreeRTOS\src/heap_2.c **** 					pxNewBlockLink->xBlockSize = pxBlock->xBlockSize - xWantedSize;
+ 182:FreeRTOS\src/heap_2.c **** 					pxBlock->xBlockSize = xWantedSize;
+ 183:FreeRTOS\src/heap_2.c **** 
+ 184:FreeRTOS\src/heap_2.c **** 					/* Insert the new block into the list of free blocks. */
+ 185:FreeRTOS\src/heap_2.c **** 					prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
+ 186:FreeRTOS\src/heap_2.c **** 				}
+ 187:FreeRTOS\src/heap_2.c **** 
+ 188:FreeRTOS\src/heap_2.c **** 				xFreeBytesRemaining -= pxBlock->xBlockSize;
+ 189:FreeRTOS\src/heap_2.c **** 			}
+ 190:FreeRTOS\src/heap_2.c **** 		}
+ 191:FreeRTOS\src/heap_2.c **** 
+ 192:FreeRTOS\src/heap_2.c **** 		traceMALLOC( pvReturn, xWantedSize );
+ 193:FreeRTOS\src/heap_2.c **** 	}
+ 194:FreeRTOS\src/heap_2.c **** 	( void ) xTaskResumeAll();
+ 195:FreeRTOS\src/heap_2.c **** 
+ 196:FreeRTOS\src/heap_2.c **** 	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
+ 197:FreeRTOS\src/heap_2.c **** 	{
+ 198:FreeRTOS\src/heap_2.c **** 		if( pvReturn == NULL )
+ 199:FreeRTOS\src/heap_2.c **** 		{
+ 200:FreeRTOS\src/heap_2.c **** 			extern void vApplicationMallocFailedHook( void );
+ 201:FreeRTOS\src/heap_2.c **** 			vApplicationMallocFailedHook();
+ 202:FreeRTOS\src/heap_2.c **** 		}
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 5
+
+
+ 203:FreeRTOS\src/heap_2.c **** 	}
+ 204:FreeRTOS\src/heap_2.c **** 	#endif
+ 205:FreeRTOS\src/heap_2.c **** 
+ 206:FreeRTOS\src/heap_2.c **** 	return pvReturn;
+ 207:FreeRTOS\src/heap_2.c **** }
+ 208:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 209:FreeRTOS\src/heap_2.c **** 
+ 210:FreeRTOS\src/heap_2.c **** void vPortFree( void *pv )
+ 211:FreeRTOS\src/heap_2.c **** {
+ 212:FreeRTOS\src/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 213:FreeRTOS\src/heap_2.c **** BlockLink_t *pxLink;
+ 214:FreeRTOS\src/heap_2.c **** 
+ 215:FreeRTOS\src/heap_2.c **** 	if( pv != NULL )
+ 216:FreeRTOS\src/heap_2.c **** 	{
+ 217:FreeRTOS\src/heap_2.c **** 		/* The memory being freed will have an BlockLink_t structure immediately
+ 218:FreeRTOS\src/heap_2.c **** 		before it. */
+ 219:FreeRTOS\src/heap_2.c **** 		puc -= heapSTRUCT_SIZE;
+ 220:FreeRTOS\src/heap_2.c **** 
+ 221:FreeRTOS\src/heap_2.c **** 		/* This unexpected casting is to keep some compilers from issuing
+ 222:FreeRTOS\src/heap_2.c **** 		byte alignment warnings. */
+ 223:FreeRTOS\src/heap_2.c **** 		pxLink = ( void * ) puc;
+ 224:FreeRTOS\src/heap_2.c **** 
+ 225:FreeRTOS\src/heap_2.c **** 		vTaskSuspendAll();
+ 226:FreeRTOS\src/heap_2.c **** 		{
+ 227:FreeRTOS\src/heap_2.c **** 			/* Add this block to the list of free blocks. */
+ 228:FreeRTOS\src/heap_2.c **** 			prvInsertBlockIntoFreeList( ( ( BlockLink_t * ) pxLink ) );
+ 229:FreeRTOS\src/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 230:FreeRTOS\src/heap_2.c **** 			traceFREE( pv, pxLink->xBlockSize );
+ 231:FreeRTOS\src/heap_2.c **** 		}
+ 232:FreeRTOS\src/heap_2.c **** 		( void ) xTaskResumeAll();
+ 233:FreeRTOS\src/heap_2.c **** 	}
+ 234:FreeRTOS\src/heap_2.c **** }
+ 235:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 236:FreeRTOS\src/heap_2.c **** 
+ 237:FreeRTOS\src/heap_2.c **** size_t xPortGetFreeHeapSize( void )
+ 238:FreeRTOS\src/heap_2.c **** {
+ 239:FreeRTOS\src/heap_2.c **** 	return xFreeBytesRemaining;
+ 240:FreeRTOS\src/heap_2.c **** }
+ 241:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 242:FreeRTOS\src/heap_2.c **** 
+ 243:FreeRTOS\src/heap_2.c **** void vPortInitialiseBlocks( void )
+ 244:FreeRTOS\src/heap_2.c **** {
+ 245:FreeRTOS\src/heap_2.c **** 	/* This just exists to keep the linker quiet. */
+ 246:FreeRTOS\src/heap_2.c **** }
+ 247:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 248:FreeRTOS\src/heap_2.c **** 
+ 249:FreeRTOS\src/heap_2.c **** static void prvHeapInit( void )
+ 250:FreeRTOS\src/heap_2.c **** {
+  27              		.loc 1 250 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+ 251:FreeRTOS\src/heap_2.c **** BlockLink_t *pxFirstFreeBlock;
+ 252:FreeRTOS\src/heap_2.c **** uint8_t *pucAlignedHeap;
+ 253:FreeRTOS\src/heap_2.c **** 
+ 254:FreeRTOS\src/heap_2.c **** 	/* Ensure the heap starts on a correctly aligned boundary. */
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 6
+
+
+ 255:FreeRTOS\src/heap_2.c **** 	pucAlignedHeap = ( uint8_t * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ portBYTE_ALIGNMENT ] ) & ( ~
+  32              		.loc 1 255 0
+  33 0000 094A     		ldr	r2, .L2
+  34 0002 22F00702 		bic	r2, r2, #7
+  35              	.LVL0:
+ 256:FreeRTOS\src/heap_2.c **** 
+ 257:FreeRTOS\src/heap_2.c **** 	/* xStart is used to hold a pointer to the first item in the list of free
+ 258:FreeRTOS\src/heap_2.c **** 	blocks.  The void cast is used to prevent compiler warnings. */
+ 259:FreeRTOS\src/heap_2.c **** 	xStart.pxNextFreeBlock = ( void * ) pucAlignedHeap;
+  36              		.loc 1 259 0
+  37 0006 094B     		ldr	r3, .L2+4
+  38 0008 C3F83829 		str	r2, [r3, #2360]
+ 260:FreeRTOS\src/heap_2.c **** 	xStart.xBlockSize = ( size_t ) 0;
+  39              		.loc 1 260 0
+  40 000c 0020     		movs	r0, #0
+  41 000e C3F83C09 		str	r0, [r3, #2364]
+ 261:FreeRTOS\src/heap_2.c **** 
+ 262:FreeRTOS\src/heap_2.c **** 	/* xEnd is used to mark the end of the list of free blocks. */
+ 263:FreeRTOS\src/heap_2.c **** 	xEnd.xBlockSize = configADJUSTED_HEAP_SIZE;
+  42              		.loc 1 263 0
+  43 0012 47F6F871 		movw	r1, #32760
+  44 0016 C3F84419 		str	r1, [r3, #2372]
+ 264:FreeRTOS\src/heap_2.c **** 	xEnd.pxNextFreeBlock = NULL;
+  45              		.loc 1 264 0
+  46 001a C3F84009 		str	r0, [r3, #2368]
+  47              	.LVL1:
+ 265:FreeRTOS\src/heap_2.c **** 
+ 266:FreeRTOS\src/heap_2.c **** 	/* To start with there is a single free block that is sized to take up the
+ 267:FreeRTOS\src/heap_2.c **** 	entire heap space. */
+ 268:FreeRTOS\src/heap_2.c **** 	pxFirstFreeBlock = ( void * ) pucAlignedHeap;
+ 269:FreeRTOS\src/heap_2.c **** 	pxFirstFreeBlock->xBlockSize = configADJUSTED_HEAP_SIZE;
+  48              		.loc 1 269 0
+  49 001e 5160     		str	r1, [r2, #4]
+ 270:FreeRTOS\src/heap_2.c **** 	pxFirstFreeBlock->pxNextFreeBlock = &xEnd;
+  50              		.loc 1 270 0
+  51 0020 03F51463 		add	r3, r3, #2368
+  52 0024 1360     		str	r3, [r2]
+  53 0026 7047     		bx	lr
+  54              	.L3:
+  55              		.align	2
+  56              	.L2:
+  57 0028 08000000 		.word	.LANCHOR0+8
+  58 002c C8760000 		.word	.LANCHOR1
+  59              		.cfi_endproc
+  60              	.LFE9:
+  61              		.size	prvHeapInit, .-prvHeapInit
+  62              		.section	.text.pvPortMalloc,"ax",%progbits
+  63              		.align	2
+  64              		.global	pvPortMalloc
+  65              		.thumb
+  66              		.thumb_func
+  67              		.type	pvPortMalloc, %function
+  68              	pvPortMalloc:
+  69              	.LFB5:
+ 119:FreeRTOS\src/heap_2.c **** BlockLink_t *pxBlock, *pxPreviousBlock, *pxNewBlockLink;
+  70              		.loc 1 119 0
+  71              		.cfi_startproc
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 7
+
+
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74              	.LVL2:
+  75 0000 70B5     		push	{r4, r5, r6, lr}
+  76              		.cfi_def_cfa_offset 16
+  77              		.cfi_offset 4, -16
+  78              		.cfi_offset 5, -12
+  79              		.cfi_offset 6, -8
+  80              		.cfi_offset 14, -4
+  81 0002 0446     		mov	r4, r0
+  82              	.LVL3:
+ 124:FreeRTOS\src/heap_2.c **** 	{
+  83              		.loc 1 124 0
+  84 0004 FFF7FEFF 		bl	vTaskSuspendAll
+  85              	.LVL4:
+ 128:FreeRTOS\src/heap_2.c **** 		{
+  86              		.loc 1 128 0
+  87 0008 244B     		ldr	r3, .L17
+  88 000a D3F84839 		ldr	r3, [r3, #2376]
+  89 000e 2BB9     		cbnz	r3, .L5
+ 130:FreeRTOS\src/heap_2.c **** 			xHeapHasBeenInitialised = pdTRUE;
+  90              		.loc 1 130 0
+  91 0010 FFF7FEFF 		bl	prvHeapInit
+  92              	.LVL5:
+ 131:FreeRTOS\src/heap_2.c **** 		}
+  93              		.loc 1 131 0
+  94 0014 0122     		movs	r2, #1
+  95 0016 214B     		ldr	r3, .L17
+  96 0018 C3F84829 		str	r2, [r3, #2376]
+  97              	.L5:
+ 136:FreeRTOS\src/heap_2.c **** 		{
+  98              		.loc 1 136 0
+  99 001c 34B1     		cbz	r4, .L6
+ 138:FreeRTOS\src/heap_2.c **** 
+ 100              		.loc 1 138 0
+ 101 001e 0834     		adds	r4, r4, #8
+ 102              	.LVL6:
+ 141:FreeRTOS\src/heap_2.c **** 			{
+ 103              		.loc 1 141 0
+ 104 0020 14F0070F 		tst	r4, #7
+ 105 0024 02D0     		beq	.L6
+ 144:FreeRTOS\src/heap_2.c **** 			}
+ 106              		.loc 1 144 0
+ 107 0026 24F00704 		bic	r4, r4, #7
+ 108              	.LVL7:
+ 109 002a 0834     		adds	r4, r4, #8
+ 110              	.LVL8:
+ 111              	.L6:
+ 148:FreeRTOS\src/heap_2.c **** 		{
+ 112              		.loc 1 148 0
+ 113 002c 621E     		subs	r2, r4, #1
+ 114 002e 47F6F673 		movw	r3, #32758
+ 115 0032 9A42     		cmp	r2, r3
+ 116 0034 2BD8     		bhi	.L12
+ 117              	.LVL9:
+ 153:FreeRTOS\src/heap_2.c **** 			while( ( pxBlock->xBlockSize < xWantedSize ) && ( pxBlock->pxNextFreeBlock != NULL ) )
+ 118              		.loc 1 153 0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 8
+
+
+ 119 0036 1949     		ldr	r1, .L17
+ 120 0038 D1F83839 		ldr	r3, [r1, #2360]
+ 121              	.LVL10:
+ 152:FreeRTOS\src/heap_2.c **** 			pxBlock = xStart.pxNextFreeBlock;
+ 122              		.loc 1 152 0
+ 123 003c 01F63811 		addw	r1, r1, #2360
+ 154:FreeRTOS\src/heap_2.c **** 			{
+ 124              		.loc 1 154 0
+ 125 0040 01E0     		b	.L9
+ 126              	.LVL11:
+ 127              	.L13:
+ 156:FreeRTOS\src/heap_2.c **** 				pxBlock = pxBlock->pxNextFreeBlock;
+ 128              		.loc 1 156 0
+ 129 0042 1946     		mov	r1, r3
+ 130              	.LVL12:
+ 157:FreeRTOS\src/heap_2.c **** 			}
+ 131              		.loc 1 157 0
+ 132 0044 1346     		mov	r3, r2
+ 133              	.LVL13:
+ 134              	.L9:
+ 154:FreeRTOS\src/heap_2.c **** 			{
+ 135              		.loc 1 154 0
+ 136 0046 5A68     		ldr	r2, [r3, #4]
+ 137 0048 9442     		cmp	r4, r2
+ 138 004a 02D9     		bls	.L8
+ 154:FreeRTOS\src/heap_2.c **** 			{
+ 139              		.loc 1 154 0 is_stmt 0 discriminator 1
+ 140 004c 1A68     		ldr	r2, [r3]
+ 141 004e 002A     		cmp	r2, #0
+ 142 0050 F7D1     		bne	.L13
+ 143              	.L8:
+ 161:FreeRTOS\src/heap_2.c **** 			{
+ 144              		.loc 1 161 0 is_stmt 1
+ 145 0052 134A     		ldr	r2, .L17+4
+ 146 0054 9342     		cmp	r3, r2
+ 147 0056 1CD0     		beq	.L14
+ 165:FreeRTOS\src/heap_2.c **** 
+ 148              		.loc 1 165 0
+ 149 0058 0D68     		ldr	r5, [r1]
+ 150 005a 0835     		adds	r5, r5, #8
+ 151              	.LVL14:
+ 169:FreeRTOS\src/heap_2.c **** 
+ 152              		.loc 1 169 0
+ 153 005c 1A68     		ldr	r2, [r3]
+ 154 005e 0A60     		str	r2, [r1]
+ 172:FreeRTOS\src/heap_2.c **** 				{
+ 155              		.loc 1 172 0
+ 156 0060 5A68     		ldr	r2, [r3, #4]
+ 157 0062 121B     		subs	r2, r2, r4
+ 158 0064 102A     		cmp	r2, #16
+ 159 0066 0CD9     		bls	.L10
+ 177:FreeRTOS\src/heap_2.c **** 
+ 160              		.loc 1 177 0
+ 161 0068 1E19     		adds	r6, r3, r4
+ 162              	.LVL15:
+ 181:FreeRTOS\src/heap_2.c **** 					pxBlock->xBlockSize = xWantedSize;
+ 163              		.loc 1 181 0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 9
+
+
+ 164 006a 7260     		str	r2, [r6, #4]
+ 182:FreeRTOS\src/heap_2.c **** 
+ 165              		.loc 1 182 0
+ 166 006c 5C60     		str	r4, [r3, #4]
+ 167              	.LBB2:
+ 185:FreeRTOS\src/heap_2.c **** 				}
+ 168              		.loc 1 185 0
+ 169 006e 7468     		ldr	r4, [r6, #4]
+ 170              	.LVL16:
+ 171 0070 0C49     		ldr	r1, .L17+8
+ 172              	.LVL17:
+ 173 0072 00E0     		b	.L11
+ 174              	.LVL18:
+ 175              	.L15:
+ 176 0074 1146     		mov	r1, r2
+ 177              	.LVL19:
+ 178              	.L11:
+ 185:FreeRTOS\src/heap_2.c **** 				}
+ 179              		.loc 1 185 0 is_stmt 0 discriminator 1
+ 180 0076 0A68     		ldr	r2, [r1]
+ 181 0078 5068     		ldr	r0, [r2, #4]
+ 182 007a 8442     		cmp	r4, r0
+ 183 007c FAD8     		bhi	.L15
+ 185:FreeRTOS\src/heap_2.c **** 				}
+ 184              		.loc 1 185 0 discriminator 4
+ 185 007e 3260     		str	r2, [r6]
+ 186              	.LVL20:
+ 187 0080 0E60     		str	r6, [r1]
+ 188              	.LVL21:
+ 189              	.L10:
+ 190              	.LBE2:
+ 188:FreeRTOS\src/heap_2.c **** 			}
+ 191              		.loc 1 188 0 is_stmt 1
+ 192 0082 5968     		ldr	r1, [r3, #4]
+ 193 0084 084A     		ldr	r2, .L17+12
+ 194 0086 1368     		ldr	r3, [r2]
+ 195              	.LVL22:
+ 196 0088 5B1A     		subs	r3, r3, r1
+ 197 008a 1360     		str	r3, [r2]
+ 198 008c 02E0     		b	.L7
+ 199              	.LVL23:
+ 200              	.L12:
+ 122:FreeRTOS\src/heap_2.c **** 
+ 201              		.loc 1 122 0
+ 202 008e 0025     		movs	r5, #0
+ 203 0090 00E0     		b	.L7
+ 204              	.LVL24:
+ 205              	.L14:
+ 206 0092 0025     		movs	r5, #0
+ 207              	.LVL25:
+ 208              	.L7:
+ 194:FreeRTOS\src/heap_2.c **** 
+ 209              		.loc 1 194 0
+ 210 0094 FFF7FEFF 		bl	xTaskResumeAll
+ 211              	.LVL26:
+ 207:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ 212              		.loc 1 207 0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 10
+
+
+ 213 0098 2846     		mov	r0, r5
+ 214 009a 70BD     		pop	{r4, r5, r6, pc}
+ 215              	.LVL27:
+ 216              	.L18:
+ 217              		.align	2
+ 218              	.L17:
+ 219 009c C8760000 		.word	.LANCHOR1
+ 220 00a0 08800000 		.word	.LANCHOR1+2368
+ 221 00a4 00800000 		.word	.LANCHOR1+2360
+ 222 00a8 00000000 		.word	.LANCHOR2
+ 223              		.cfi_endproc
+ 224              	.LFE5:
+ 225              		.size	pvPortMalloc, .-pvPortMalloc
+ 226              		.section	.text.vPortFree,"ax",%progbits
+ 227              		.align	2
+ 228              		.global	vPortFree
+ 229              		.thumb
+ 230              		.thumb_func
+ 231              		.type	vPortFree, %function
+ 232              	vPortFree:
+ 233              	.LFB6:
+ 211:FreeRTOS\src/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 234              		.loc 1 211 0
+ 235              		.cfi_startproc
+ 236              		@ args = 0, pretend = 0, frame = 0
+ 237              		@ frame_needed = 0, uses_anonymous_args = 0
+ 238              	.LVL28:
+ 215:FreeRTOS\src/heap_2.c **** 	{
+ 239              		.loc 1 215 0
+ 240 0000 D0B1     		cbz	r0, .L24
+ 211:FreeRTOS\src/heap_2.c **** uint8_t *puc = ( uint8_t * ) pv;
+ 241              		.loc 1 211 0
+ 242 0002 70B5     		push	{r4, r5, r6, lr}
+ 243              		.cfi_def_cfa_offset 16
+ 244              		.cfi_offset 4, -16
+ 245              		.cfi_offset 5, -12
+ 246              		.cfi_offset 6, -8
+ 247              		.cfi_offset 14, -4
+ 248 0004 0546     		mov	r5, r0
+ 219:FreeRTOS\src/heap_2.c **** 
+ 249              		.loc 1 219 0
+ 250 0006 A0F10806 		sub	r6, r0, #8
+ 251              	.LVL29:
+ 225:FreeRTOS\src/heap_2.c **** 		{
+ 252              		.loc 1 225 0
+ 253 000a FFF7FEFF 		bl	vTaskSuspendAll
+ 254              	.LVL30:
+ 255              	.LBB3:
+ 228:FreeRTOS\src/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 256              		.loc 1 228 0
+ 257 000e 55F8044C 		ldr	r4, [r5, #-4]
+ 258              	.LVL31:
+ 259 0012 0A4A     		ldr	r2, .L25
+ 260 0014 00E0     		b	.L21
+ 261              	.LVL32:
+ 262              	.L22:
+ 263 0016 1A46     		mov	r2, r3
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 11
+
+
+ 264              	.LVL33:
+ 265              	.L21:
+ 228:FreeRTOS\src/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 266              		.loc 1 228 0 is_stmt 0 discriminator 1
+ 267 0018 1368     		ldr	r3, [r2]
+ 268 001a 5968     		ldr	r1, [r3, #4]
+ 269 001c 8C42     		cmp	r4, r1
+ 270 001e FAD8     		bhi	.L22
+ 228:FreeRTOS\src/heap_2.c **** 			xFreeBytesRemaining += pxLink->xBlockSize;
+ 271              		.loc 1 228 0 discriminator 4
+ 272 0020 45F8083C 		str	r3, [r5, #-8]
+ 273 0024 1660     		str	r6, [r2]
+ 274              	.LBE3:
+ 229:FreeRTOS\src/heap_2.c **** 			traceFREE( pv, pxLink->xBlockSize );
+ 275              		.loc 1 229 0 is_stmt 1 discriminator 4
+ 276 0026 55F8043C 		ldr	r3, [r5, #-4]
+ 277 002a 054A     		ldr	r2, .L25+4
+ 278              	.LVL34:
+ 279 002c 1168     		ldr	r1, [r2]
+ 280 002e 0B44     		add	r3, r3, r1
+ 281 0030 1360     		str	r3, [r2]
+ 232:FreeRTOS\src/heap_2.c **** 	}
+ 282              		.loc 1 232 0 discriminator 4
+ 283 0032 FFF7FEFF 		bl	xTaskResumeAll
+ 284              	.LVL35:
+ 285 0036 70BD     		pop	{r4, r5, r6, pc}
+ 286              	.LVL36:
+ 287              	.L24:
+ 288              		.cfi_def_cfa_offset 0
+ 289              		.cfi_restore 4
+ 290              		.cfi_restore 5
+ 291              		.cfi_restore 6
+ 292              		.cfi_restore 14
+ 293 0038 7047     		bx	lr
+ 294              	.L26:
+ 295 003a 00BF     		.align	2
+ 296              	.L25:
+ 297 003c 00800000 		.word	.LANCHOR1+2360
+ 298 0040 00000000 		.word	.LANCHOR2
+ 299              		.cfi_endproc
+ 300              	.LFE6:
+ 301              		.size	vPortFree, .-vPortFree
+ 302              		.section	.text.xPortGetFreeHeapSize,"ax",%progbits
+ 303              		.align	2
+ 304              		.global	xPortGetFreeHeapSize
+ 305              		.thumb
+ 306              		.thumb_func
+ 307              		.type	xPortGetFreeHeapSize, %function
+ 308              	xPortGetFreeHeapSize:
+ 309              	.LFB7:
+ 238:FreeRTOS\src/heap_2.c **** 	return xFreeBytesRemaining;
+ 310              		.loc 1 238 0
+ 311              		.cfi_startproc
+ 312              		@ args = 0, pretend = 0, frame = 0
+ 313              		@ frame_needed = 0, uses_anonymous_args = 0
+ 314              		@ link register save eliminated.
+ 240:FreeRTOS\src/heap_2.c **** /*-----------------------------------------------------------*/
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 12
+
+
+ 315              		.loc 1 240 0
+ 316 0000 014B     		ldr	r3, .L28
+ 317 0002 1868     		ldr	r0, [r3]
+ 318 0004 7047     		bx	lr
+ 319              	.L29:
+ 320 0006 00BF     		.align	2
+ 321              	.L28:
+ 322 0008 00000000 		.word	.LANCHOR2
+ 323              		.cfi_endproc
+ 324              	.LFE7:
+ 325              		.size	xPortGetFreeHeapSize, .-xPortGetFreeHeapSize
+ 326              		.section	.text.vPortInitialiseBlocks,"ax",%progbits
+ 327              		.align	2
+ 328              		.global	vPortInitialiseBlocks
+ 329              		.thumb
+ 330              		.thumb_func
+ 331              		.type	vPortInitialiseBlocks, %function
+ 332              	vPortInitialiseBlocks:
+ 333              	.LFB8:
+ 244:FreeRTOS\src/heap_2.c **** 	/* This just exists to keep the linker quiet. */
+ 334              		.loc 1 244 0
+ 335              		.cfi_startproc
+ 336              		@ args = 0, pretend = 0, frame = 0
+ 337              		@ frame_needed = 0, uses_anonymous_args = 0
+ 338              		@ link register save eliminated.
+ 339 0000 7047     		bx	lr
+ 340              		.cfi_endproc
+ 341              	.LFE8:
+ 342              		.size	vPortInitialiseBlocks, .-vPortInitialiseBlocks
+ 343 0002 00BF     		.data
+ 344              		.align	2
+ 345              		.set	.LANCHOR2,. + 0
+ 346              		.type	xFreeBytesRemaining, %object
+ 347              		.size	xFreeBytesRemaining, 4
+ 348              	xFreeBytesRemaining:
+ 349 0000 F87F0000 		.word	32760
+ 350              		.bss
+ 351              		.align	2
+ 352              		.set	.LANCHOR0,. + 0
+ 353              		.set	.LANCHOR1,. + 30408
+ 354              		.type	ucHeap, %object
+ 355              		.size	ucHeap, 32768
+ 356              	ucHeap:
+ 357 0000 00000000 		.space	32768
+ 357      00000000 
+ 357      00000000 
+ 357      00000000 
+ 357      00000000 
+ 358              		.type	xStart, %object
+ 359              		.size	xStart, 8
+ 360              	xStart:
+ 361 8000 00000000 		.space	8
+ 361      00000000 
+ 362              		.type	xEnd, %object
+ 363              		.size	xEnd, 8
+ 364              	xEnd:
+ 365 8008 00000000 		.space	8
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 13
+
+
+ 365      00000000 
+ 366              		.type	xHeapHasBeenInitialised.5160, %object
+ 367              		.size	xHeapHasBeenInitialised.5160, 4
+ 368              	xHeapHasBeenInitialised.5160:
+ 369 8010 00000000 		.space	4
+ 370              		.text
+ 371              	.Letext0:
+ 372              		.file 2 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\lib\\gcc\\arm-none
+ 373              		.file 3 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 374              		.file 4 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 375              		.file 5 ".\\FreeRTOS\\include/portmacro.h"
+ 376              		.file 6 ".\\FreeRTOS\\include/task.h"
+ 377              		.section	.debug_info,"",%progbits
+ 378              	.Ldebug_info0:
+ 379 0000 2A030000 		.4byte	0x32a
+ 380 0004 0400     		.2byte	0x4
+ 381 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 382 000a 04       		.byte	0x4
+ 383 000b 01       		.uleb128 0x1
+ 384 000c 07010000 		.4byte	.LASF40
+ 385 0010 0C       		.byte	0xc
+ 386 0011 88000000 		.4byte	.LASF41
+ 387 0015 21000000 		.4byte	.LASF42
+ 388 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 389 001d 00000000 		.4byte	0
+ 390 0021 00000000 		.4byte	.Ldebug_line0
+ 391 0025 02       		.uleb128 0x2
+ 392 0026 0A000000 		.4byte	.LASF4
+ 393 002a 02       		.byte	0x2
+ 394 002b D8       		.byte	0xd8
+ 395 002c 30000000 		.4byte	0x30
+ 396 0030 03       		.uleb128 0x3
+ 397 0031 04       		.byte	0x4
+ 398 0032 07       		.byte	0x7
+ 399 0033 48020000 		.4byte	.LASF0
+ 400 0037 04       		.uleb128 0x4
+ 401 0038 04       		.byte	0x4
+ 402 0039 05       		.byte	0x5
+ 403 003a 696E7400 		.ascii	"int\000"
+ 404 003e 03       		.uleb128 0x3
+ 405 003f 08       		.byte	0x8
+ 406 0040 05       		.byte	0x5
+ 407 0041 8C020000 		.4byte	.LASF1
+ 408 0045 03       		.uleb128 0x3
+ 409 0046 08       		.byte	0x8
+ 410 0047 04       		.byte	0x4
+ 411 0048 FE020000 		.4byte	.LASF2
+ 412 004c 03       		.uleb128 0x3
+ 413 004d 01       		.byte	0x1
+ 414 004e 06       		.byte	0x6
+ 415 004f 0A030000 		.4byte	.LASF3
+ 416 0053 02       		.uleb128 0x2
+ 417 0054 00000000 		.4byte	.LASF5
+ 418 0058 03       		.byte	0x3
+ 419 0059 1D       		.byte	0x1d
+ 420 005a 5E000000 		.4byte	0x5e
+ 421 005e 03       		.uleb128 0x3
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 14
+
+
+ 422 005f 01       		.byte	0x1
+ 423 0060 08       		.byte	0x8
+ 424 0061 F9000000 		.4byte	.LASF6
+ 425 0065 03       		.uleb128 0x3
+ 426 0066 02       		.byte	0x2
+ 427 0067 05       		.byte	0x5
+ 428 0068 C5020000 		.4byte	.LASF7
+ 429 006c 02       		.uleb128 0x2
+ 430 006d E2010000 		.4byte	.LASF8
+ 431 0071 03       		.byte	0x3
+ 432 0072 2B       		.byte	0x2b
+ 433 0073 77000000 		.4byte	0x77
+ 434 0077 03       		.uleb128 0x3
+ 435 0078 02       		.byte	0x2
+ 436 0079 07       		.byte	0x7
+ 437 007a B2010000 		.4byte	.LASF9
+ 438 007e 03       		.uleb128 0x3
+ 439 007f 04       		.byte	0x4
+ 440 0080 05       		.byte	0x5
+ 441 0081 F5020000 		.4byte	.LASF10
+ 442 0085 02       		.uleb128 0x2
+ 443 0086 07020000 		.4byte	.LASF11
+ 444 008a 03       		.byte	0x3
+ 445 008b 41       		.byte	0x41
+ 446 008c 90000000 		.4byte	0x90
+ 447 0090 03       		.uleb128 0x3
+ 448 0091 04       		.byte	0x4
+ 449 0092 07       		.byte	0x7
+ 450 0093 A0010000 		.4byte	.LASF12
+ 451 0097 03       		.uleb128 0x3
+ 452 0098 08       		.byte	0x8
+ 453 0099 07       		.byte	0x7
+ 454 009a 55020000 		.4byte	.LASF13
+ 455 009e 03       		.uleb128 0x3
+ 456 009f 04       		.byte	0x4
+ 457 00a0 07       		.byte	0x7
+ 458 00a1 83020000 		.4byte	.LASF14
+ 459 00a5 05       		.uleb128 0x5
+ 460 00a6 04       		.byte	0x4
+ 461 00a7 03       		.uleb128 0x3
+ 462 00a8 01       		.byte	0x1
+ 463 00a9 08       		.byte	0x8
+ 464 00aa A6020000 		.4byte	.LASF15
+ 465 00ae 02       		.uleb128 0x2
+ 466 00af 6C020000 		.4byte	.LASF16
+ 467 00b3 04       		.byte	0x4
+ 468 00b4 18       		.byte	0x18
+ 469 00b5 53000000 		.4byte	0x53
+ 470 00b9 02       		.uleb128 0x2
+ 471 00ba CF020000 		.4byte	.LASF17
+ 472 00be 04       		.byte	0x4
+ 473 00bf 24       		.byte	0x24
+ 474 00c0 6C000000 		.4byte	0x6c
+ 475 00c4 02       		.uleb128 0x2
+ 476 00c5 EC020000 		.4byte	.LASF18
+ 477 00c9 04       		.byte	0x4
+ 478 00ca 30       		.byte	0x30
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 15
+
+
+ 479 00cb 85000000 		.4byte	0x85
+ 480 00cf 02       		.uleb128 0x2
+ 481 00d0 26030000 		.4byte	.LASF19
+ 482 00d4 05       		.byte	0x5
+ 483 00d5 38       		.byte	0x38
+ 484 00d6 7E000000 		.4byte	0x7e
+ 485 00da 06       		.uleb128 0x6
+ 486 00db 04       		.byte	0x4
+ 487 00dc AE000000 		.4byte	0xae
+ 488 00e0 07       		.uleb128 0x7
+ 489 00e1 7B000000 		.4byte	.LASF43
+ 490 00e5 08       		.byte	0x8
+ 491 00e6 01       		.byte	0x1
+ 492 00e7 49       		.byte	0x49
+ 493 00e8 05010000 		.4byte	0x105
+ 494 00ec 08       		.uleb128 0x8
+ 495 00ed 16030000 		.4byte	.LASF20
+ 496 00f1 01       		.byte	0x1
+ 497 00f2 4B       		.byte	0x4b
+ 498 00f3 05010000 		.4byte	0x105
+ 499 00f7 00       		.byte	0
+ 500 00f8 08       		.uleb128 0x8
+ 501 00f9 95010000 		.4byte	.LASF21
+ 502 00fd 01       		.byte	0x1
+ 503 00fe 4C       		.byte	0x4c
+ 504 00ff 25000000 		.4byte	0x25
+ 505 0103 04       		.byte	0x4
+ 506 0104 00       		.byte	0
+ 507 0105 06       		.uleb128 0x6
+ 508 0106 04       		.byte	0x4
+ 509 0107 E0000000 		.4byte	0xe0
+ 510 010b 02       		.uleb128 0x2
+ 511 010c B9000000 		.4byte	.LASF22
+ 512 0110 01       		.byte	0x1
+ 513 0111 4D       		.byte	0x4d
+ 514 0112 E0000000 		.4byte	0xe0
+ 515 0116 09       		.uleb128 0x9
+ 516 0117 9E000000 		.4byte	.LASF44
+ 517 011b 01       		.byte	0x1
+ 518 011c F9       		.byte	0xf9
+ 519 011d 00000000 		.4byte	.LFB9
+ 520 0121 30000000 		.4byte	.LFE9-.LFB9
+ 521 0125 01       		.uleb128 0x1
+ 522 0126 9C       		.byte	0x9c
+ 523 0127 46010000 		.4byte	0x146
+ 524 012b 0A       		.uleb128 0xa
+ 525 012c E1000000 		.4byte	.LASF23
+ 526 0130 01       		.byte	0x1
+ 527 0131 FB       		.byte	0xfb
+ 528 0132 46010000 		.4byte	0x146
+ 529 0136 01       		.uleb128 0x1
+ 530 0137 52       		.byte	0x52
+ 531 0138 0A       		.uleb128 0xa
+ 532 0139 AB020000 		.4byte	.LASF24
+ 533 013d 01       		.byte	0x1
+ 534 013e FC       		.byte	0xfc
+ 535 013f DA000000 		.4byte	0xda
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 16
+
+
+ 536 0143 01       		.uleb128 0x1
+ 537 0144 52       		.byte	0x52
+ 538 0145 00       		.byte	0
+ 539 0146 06       		.uleb128 0x6
+ 540 0147 04       		.byte	0x4
+ 541 0148 0B010000 		.4byte	0x10b
+ 542 014c 0B       		.uleb128 0xb
+ 543 014d D4000000 		.4byte	.LASF45
+ 544 0151 01       		.byte	0x1
+ 545 0152 76       		.byte	0x76
+ 546 0153 A5000000 		.4byte	0xa5
+ 547 0157 00000000 		.4byte	.LFB5
+ 548 015b AC000000 		.4byte	.LFE5-.LFB5
+ 549 015f 01       		.uleb128 0x1
+ 550 0160 9C       		.byte	0x9c
+ 551 0161 09020000 		.4byte	0x209
+ 552 0165 0C       		.uleb128 0xc
+ 553 0166 9A020000 		.4byte	.LASF31
+ 554 016a 01       		.byte	0x1
+ 555 016b 76       		.byte	0x76
+ 556 016c 25000000 		.4byte	0x25
+ 557 0170 00000000 		.4byte	.LLST0
+ 558 0174 0D       		.uleb128 0xd
+ 559 0175 C5000000 		.4byte	.LASF25
+ 560 0179 01       		.byte	0x1
+ 561 017a 78       		.byte	0x78
+ 562 017b 46010000 		.4byte	0x146
+ 563 017f 50000000 		.4byte	.LLST1
+ 564 0183 0D       		.uleb128 0xd
+ 565 0184 ED010000 		.4byte	.LASF26
+ 566 0188 01       		.byte	0x1
+ 567 0189 78       		.byte	0x78
+ 568 018a 46010000 		.4byte	0x146
+ 569 018e 6E000000 		.4byte	.LLST2
+ 570 0192 0D       		.uleb128 0xd
+ 571 0193 74020000 		.4byte	.LASF27
+ 572 0197 01       		.byte	0x1
+ 573 0198 78       		.byte	0x78
+ 574 0199 46010000 		.4byte	0x146
+ 575 019d A7000000 		.4byte	.LLST3
+ 576 01a1 0A       		.uleb128 0xa
+ 577 01a2 C5010000 		.4byte	.LASF28
+ 578 01a6 01       		.byte	0x1
+ 579 01a7 79       		.byte	0x79
+ 580 01a8 CF000000 		.4byte	0xcf
+ 581 01ac 05       		.uleb128 0x5
+ 582 01ad 03       		.byte	0x3
+ 583 01ae 10800000 		.4byte	xHeapHasBeenInitialised.5160
+ 584 01b2 0D       		.uleb128 0xd
+ 585 01b3 12020000 		.4byte	.LASF29
+ 586 01b7 01       		.byte	0x1
+ 587 01b8 7A       		.byte	0x7a
+ 588 01b9 A5000000 		.4byte	0xa5
+ 589 01bd BA000000 		.4byte	.LLST4
+ 590 01c1 0E       		.uleb128 0xe
+ 591 01c2 6E000000 		.4byte	.LBB2
+ 592 01c6 14000000 		.4byte	.LBE2-.LBB2
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 17
+
+
+ 593 01ca ED010000 		.4byte	0x1ed
+ 594 01ce 0D       		.uleb128 0xd
+ 595 01cf BA020000 		.4byte	.LASF30
+ 596 01d3 01       		.byte	0x1
+ 597 01d4 B9       		.byte	0xb9
+ 598 01d5 46010000 		.4byte	0x146
+ 599 01d9 FB000000 		.4byte	.LLST5
+ 600 01dd 0D       		.uleb128 0xd
+ 601 01de 95010000 		.4byte	.LASF21
+ 602 01e2 01       		.byte	0x1
+ 603 01e3 B9       		.byte	0xb9
+ 604 01e4 25000000 		.4byte	0x25
+ 605 01e8 1E010000 		.4byte	.LLST6
+ 606 01ec 00       		.byte	0
+ 607 01ed 0F       		.uleb128 0xf
+ 608 01ee 08000000 		.4byte	.LVL4
+ 609 01f2 15030000 		.4byte	0x315
+ 610 01f6 0F       		.uleb128 0xf
+ 611 01f7 14000000 		.4byte	.LVL5
+ 612 01fb 16010000 		.4byte	0x116
+ 613 01ff 0F       		.uleb128 0xf
+ 614 0200 98000000 		.4byte	.LVL26
+ 615 0204 21030000 		.4byte	0x321
+ 616 0208 00       		.byte	0
+ 617 0209 10       		.uleb128 0x10
+ 618 020a FD010000 		.4byte	.LASF46
+ 619 020e 01       		.byte	0x1
+ 620 020f D2       		.byte	0xd2
+ 621 0210 00000000 		.4byte	.LFB6
+ 622 0214 44000000 		.4byte	.LFE6-.LFB6
+ 623 0218 01       		.uleb128 0x1
+ 624 0219 9C       		.byte	0x9c
+ 625 021a 89020000 		.4byte	0x289
+ 626 021e 11       		.uleb128 0x11
+ 627 021f 707600   		.ascii	"pv\000"
+ 628 0222 01       		.byte	0x1
+ 629 0223 D2       		.byte	0xd2
+ 630 0224 A5000000 		.4byte	0xa5
+ 631 0228 31010000 		.4byte	.LLST7
+ 632 022c 12       		.uleb128 0x12
+ 633 022d 70756300 		.ascii	"puc\000"
+ 634 0231 01       		.byte	0x1
+ 635 0232 D4       		.byte	0xd4
+ 636 0233 DA000000 		.4byte	0xda
+ 637 0237 5A010000 		.4byte	.LLST8
+ 638 023b 0D       		.uleb128 0xd
+ 639 023c CD000000 		.4byte	.LASF32
+ 640 0240 01       		.byte	0x1
+ 641 0241 D5       		.byte	0xd5
+ 642 0242 46010000 		.4byte	0x146
+ 643 0246 83010000 		.4byte	.LLST9
+ 644 024a 0E       		.uleb128 0xe
+ 645 024b 0E000000 		.4byte	.LBB3
+ 646 024f 18000000 		.4byte	.LBE3-.LBB3
+ 647 0253 76020000 		.4byte	0x276
+ 648 0257 0D       		.uleb128 0xd
+ 649 0258 BA020000 		.4byte	.LASF30
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 18
+
+
+ 650 025c 01       		.byte	0x1
+ 651 025d E4       		.byte	0xe4
+ 652 025e 46010000 		.4byte	0x146
+ 653 0262 96010000 		.4byte	.LLST10
+ 654 0266 0D       		.uleb128 0xd
+ 655 0267 95010000 		.4byte	.LASF21
+ 656 026b 01       		.byte	0x1
+ 657 026c E4       		.byte	0xe4
+ 658 026d 25000000 		.4byte	0x25
+ 659 0271 B9010000 		.4byte	.LLST11
+ 660 0275 00       		.byte	0
+ 661 0276 0F       		.uleb128 0xf
+ 662 0277 0E000000 		.4byte	.LVL30
+ 663 027b 15030000 		.4byte	0x315
+ 664 027f 0F       		.uleb128 0xf
+ 665 0280 36000000 		.4byte	.LVL35
+ 666 0284 21030000 		.4byte	0x321
+ 667 0288 00       		.byte	0
+ 668 0289 13       		.uleb128 0x13
+ 669 028a 66000000 		.4byte	.LASF47
+ 670 028e 01       		.byte	0x1
+ 671 028f ED       		.byte	0xed
+ 672 0290 25000000 		.4byte	0x25
+ 673 0294 00000000 		.4byte	.LFB7
+ 674 0298 0C000000 		.4byte	.LFE7-.LFB7
+ 675 029c 01       		.uleb128 0x1
+ 676 029d 9C       		.byte	0x9c
+ 677 029e 14       		.uleb128 0x14
+ 678 029f 32020000 		.4byte	.LASF48
+ 679 02a3 01       		.byte	0x1
+ 680 02a4 F3       		.byte	0xf3
+ 681 02a5 00000000 		.4byte	.LFB8
+ 682 02a9 02000000 		.4byte	.LFE8-.LFB8
+ 683 02ad 01       		.uleb128 0x1
+ 684 02ae 9C       		.byte	0x9c
+ 685 02af 15       		.uleb128 0x15
+ 686 02b0 AE000000 		.4byte	0xae
+ 687 02b4 C0020000 		.4byte	0x2c0
+ 688 02b8 16       		.uleb128 0x16
+ 689 02b9 9E000000 		.4byte	0x9e
+ 690 02bd FF7F     		.2byte	0x7fff
+ 691 02bf 00       		.byte	0
+ 692 02c0 0A       		.uleb128 0xa
+ 693 02c1 F2000000 		.4byte	.LASF33
+ 694 02c5 01       		.byte	0x1
+ 695 02c6 43       		.byte	0x43
+ 696 02c7 AF020000 		.4byte	0x2af
+ 697 02cb 05       		.uleb128 0x5
+ 698 02cc 03       		.byte	0x3
+ 699 02cd 00000000 		.4byte	ucHeap
+ 700 02d1 17       		.uleb128 0x17
+ 701 02d2 1B020000 		.4byte	.LASF34
+ 702 02d6 01       		.byte	0x1
+ 703 02d7 50       		.byte	0x50
+ 704 02d8 DD020000 		.4byte	0x2dd
+ 705 02dc 08       		.byte	0x8
+ 706 02dd 18       		.uleb128 0x18
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 19
+
+
+ 707 02de B9000000 		.4byte	0xb9
+ 708 02e2 0A       		.uleb128 0xa
+ 709 02e3 2B020000 		.4byte	.LASF35
+ 710 02e7 01       		.byte	0x1
+ 711 02e8 54       		.byte	0x54
+ 712 02e9 0B010000 		.4byte	0x10b
+ 713 02ed 05       		.uleb128 0x5
+ 714 02ee 03       		.byte	0x3
+ 715 02ef 00800000 		.4byte	xStart
+ 716 02f3 0A       		.uleb128 0xa
+ 717 02f4 DD010000 		.4byte	.LASF36
+ 718 02f8 01       		.byte	0x1
+ 719 02f9 54       		.byte	0x54
+ 720 02fa 0B010000 		.4byte	0x10b
+ 721 02fe 05       		.uleb128 0x5
+ 722 02ff 03       		.byte	0x3
+ 723 0300 08800000 		.4byte	xEnd
+ 724 0304 0A       		.uleb128 0xa
+ 725 0305 D8020000 		.4byte	.LASF37
+ 726 0309 01       		.byte	0x1
+ 727 030a 58       		.byte	0x58
+ 728 030b 25000000 		.4byte	0x25
+ 729 030f 05       		.uleb128 0x5
+ 730 0310 03       		.byte	0x3
+ 731 0311 00000000 		.4byte	xFreeBytesRemaining
+ 732 0315 19       		.uleb128 0x19
+ 733 0316 11000000 		.4byte	.LASF38
+ 734 031a 11000000 		.4byte	.LASF38
+ 735 031e 06       		.byte	0x6
+ 736 031f FA04     		.2byte	0x4fa
+ 737 0321 19       		.uleb128 0x19
+ 738 0322 AA000000 		.4byte	.LASF39
+ 739 0326 AA000000 		.4byte	.LASF39
+ 740 032a 06       		.byte	0x6
+ 741 032b 3005     		.2byte	0x530
+ 742 032d 00       		.byte	0
+ 743              		.section	.debug_abbrev,"",%progbits
+ 744              	.Ldebug_abbrev0:
+ 745 0000 01       		.uleb128 0x1
+ 746 0001 11       		.uleb128 0x11
+ 747 0002 01       		.byte	0x1
+ 748 0003 25       		.uleb128 0x25
+ 749 0004 0E       		.uleb128 0xe
+ 750 0005 13       		.uleb128 0x13
+ 751 0006 0B       		.uleb128 0xb
+ 752 0007 03       		.uleb128 0x3
+ 753 0008 0E       		.uleb128 0xe
+ 754 0009 1B       		.uleb128 0x1b
+ 755 000a 0E       		.uleb128 0xe
+ 756 000b 55       		.uleb128 0x55
+ 757 000c 17       		.uleb128 0x17
+ 758 000d 11       		.uleb128 0x11
+ 759 000e 01       		.uleb128 0x1
+ 760 000f 10       		.uleb128 0x10
+ 761 0010 17       		.uleb128 0x17
+ 762 0011 00       		.byte	0
+ 763 0012 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 20
+
+
+ 764 0013 02       		.uleb128 0x2
+ 765 0014 16       		.uleb128 0x16
+ 766 0015 00       		.byte	0
+ 767 0016 03       		.uleb128 0x3
+ 768 0017 0E       		.uleb128 0xe
+ 769 0018 3A       		.uleb128 0x3a
+ 770 0019 0B       		.uleb128 0xb
+ 771 001a 3B       		.uleb128 0x3b
+ 772 001b 0B       		.uleb128 0xb
+ 773 001c 49       		.uleb128 0x49
+ 774 001d 13       		.uleb128 0x13
+ 775 001e 00       		.byte	0
+ 776 001f 00       		.byte	0
+ 777 0020 03       		.uleb128 0x3
+ 778 0021 24       		.uleb128 0x24
+ 779 0022 00       		.byte	0
+ 780 0023 0B       		.uleb128 0xb
+ 781 0024 0B       		.uleb128 0xb
+ 782 0025 3E       		.uleb128 0x3e
+ 783 0026 0B       		.uleb128 0xb
+ 784 0027 03       		.uleb128 0x3
+ 785 0028 0E       		.uleb128 0xe
+ 786 0029 00       		.byte	0
+ 787 002a 00       		.byte	0
+ 788 002b 04       		.uleb128 0x4
+ 789 002c 24       		.uleb128 0x24
+ 790 002d 00       		.byte	0
+ 791 002e 0B       		.uleb128 0xb
+ 792 002f 0B       		.uleb128 0xb
+ 793 0030 3E       		.uleb128 0x3e
+ 794 0031 0B       		.uleb128 0xb
+ 795 0032 03       		.uleb128 0x3
+ 796 0033 08       		.uleb128 0x8
+ 797 0034 00       		.byte	0
+ 798 0035 00       		.byte	0
+ 799 0036 05       		.uleb128 0x5
+ 800 0037 0F       		.uleb128 0xf
+ 801 0038 00       		.byte	0
+ 802 0039 0B       		.uleb128 0xb
+ 803 003a 0B       		.uleb128 0xb
+ 804 003b 00       		.byte	0
+ 805 003c 00       		.byte	0
+ 806 003d 06       		.uleb128 0x6
+ 807 003e 0F       		.uleb128 0xf
+ 808 003f 00       		.byte	0
+ 809 0040 0B       		.uleb128 0xb
+ 810 0041 0B       		.uleb128 0xb
+ 811 0042 49       		.uleb128 0x49
+ 812 0043 13       		.uleb128 0x13
+ 813 0044 00       		.byte	0
+ 814 0045 00       		.byte	0
+ 815 0046 07       		.uleb128 0x7
+ 816 0047 13       		.uleb128 0x13
+ 817 0048 01       		.byte	0x1
+ 818 0049 03       		.uleb128 0x3
+ 819 004a 0E       		.uleb128 0xe
+ 820 004b 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 21
+
+
+ 821 004c 0B       		.uleb128 0xb
+ 822 004d 3A       		.uleb128 0x3a
+ 823 004e 0B       		.uleb128 0xb
+ 824 004f 3B       		.uleb128 0x3b
+ 825 0050 0B       		.uleb128 0xb
+ 826 0051 01       		.uleb128 0x1
+ 827 0052 13       		.uleb128 0x13
+ 828 0053 00       		.byte	0
+ 829 0054 00       		.byte	0
+ 830 0055 08       		.uleb128 0x8
+ 831 0056 0D       		.uleb128 0xd
+ 832 0057 00       		.byte	0
+ 833 0058 03       		.uleb128 0x3
+ 834 0059 0E       		.uleb128 0xe
+ 835 005a 3A       		.uleb128 0x3a
+ 836 005b 0B       		.uleb128 0xb
+ 837 005c 3B       		.uleb128 0x3b
+ 838 005d 0B       		.uleb128 0xb
+ 839 005e 49       		.uleb128 0x49
+ 840 005f 13       		.uleb128 0x13
+ 841 0060 38       		.uleb128 0x38
+ 842 0061 0B       		.uleb128 0xb
+ 843 0062 00       		.byte	0
+ 844 0063 00       		.byte	0
+ 845 0064 09       		.uleb128 0x9
+ 846 0065 2E       		.uleb128 0x2e
+ 847 0066 01       		.byte	0x1
+ 848 0067 03       		.uleb128 0x3
+ 849 0068 0E       		.uleb128 0xe
+ 850 0069 3A       		.uleb128 0x3a
+ 851 006a 0B       		.uleb128 0xb
+ 852 006b 3B       		.uleb128 0x3b
+ 853 006c 0B       		.uleb128 0xb
+ 854 006d 27       		.uleb128 0x27
+ 855 006e 19       		.uleb128 0x19
+ 856 006f 11       		.uleb128 0x11
+ 857 0070 01       		.uleb128 0x1
+ 858 0071 12       		.uleb128 0x12
+ 859 0072 06       		.uleb128 0x6
+ 860 0073 40       		.uleb128 0x40
+ 861 0074 18       		.uleb128 0x18
+ 862 0075 9742     		.uleb128 0x2117
+ 863 0077 19       		.uleb128 0x19
+ 864 0078 01       		.uleb128 0x1
+ 865 0079 13       		.uleb128 0x13
+ 866 007a 00       		.byte	0
+ 867 007b 00       		.byte	0
+ 868 007c 0A       		.uleb128 0xa
+ 869 007d 34       		.uleb128 0x34
+ 870 007e 00       		.byte	0
+ 871 007f 03       		.uleb128 0x3
+ 872 0080 0E       		.uleb128 0xe
+ 873 0081 3A       		.uleb128 0x3a
+ 874 0082 0B       		.uleb128 0xb
+ 875 0083 3B       		.uleb128 0x3b
+ 876 0084 0B       		.uleb128 0xb
+ 877 0085 49       		.uleb128 0x49
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 22
+
+
+ 878 0086 13       		.uleb128 0x13
+ 879 0087 02       		.uleb128 0x2
+ 880 0088 18       		.uleb128 0x18
+ 881 0089 00       		.byte	0
+ 882 008a 00       		.byte	0
+ 883 008b 0B       		.uleb128 0xb
+ 884 008c 2E       		.uleb128 0x2e
+ 885 008d 01       		.byte	0x1
+ 886 008e 3F       		.uleb128 0x3f
+ 887 008f 19       		.uleb128 0x19
+ 888 0090 03       		.uleb128 0x3
+ 889 0091 0E       		.uleb128 0xe
+ 890 0092 3A       		.uleb128 0x3a
+ 891 0093 0B       		.uleb128 0xb
+ 892 0094 3B       		.uleb128 0x3b
+ 893 0095 0B       		.uleb128 0xb
+ 894 0096 27       		.uleb128 0x27
+ 895 0097 19       		.uleb128 0x19
+ 896 0098 49       		.uleb128 0x49
+ 897 0099 13       		.uleb128 0x13
+ 898 009a 11       		.uleb128 0x11
+ 899 009b 01       		.uleb128 0x1
+ 900 009c 12       		.uleb128 0x12
+ 901 009d 06       		.uleb128 0x6
+ 902 009e 40       		.uleb128 0x40
+ 903 009f 18       		.uleb128 0x18
+ 904 00a0 9742     		.uleb128 0x2117
+ 905 00a2 19       		.uleb128 0x19
+ 906 00a3 01       		.uleb128 0x1
+ 907 00a4 13       		.uleb128 0x13
+ 908 00a5 00       		.byte	0
+ 909 00a6 00       		.byte	0
+ 910 00a7 0C       		.uleb128 0xc
+ 911 00a8 05       		.uleb128 0x5
+ 912 00a9 00       		.byte	0
+ 913 00aa 03       		.uleb128 0x3
+ 914 00ab 0E       		.uleb128 0xe
+ 915 00ac 3A       		.uleb128 0x3a
+ 916 00ad 0B       		.uleb128 0xb
+ 917 00ae 3B       		.uleb128 0x3b
+ 918 00af 0B       		.uleb128 0xb
+ 919 00b0 49       		.uleb128 0x49
+ 920 00b1 13       		.uleb128 0x13
+ 921 00b2 02       		.uleb128 0x2
+ 922 00b3 17       		.uleb128 0x17
+ 923 00b4 00       		.byte	0
+ 924 00b5 00       		.byte	0
+ 925 00b6 0D       		.uleb128 0xd
+ 926 00b7 34       		.uleb128 0x34
+ 927 00b8 00       		.byte	0
+ 928 00b9 03       		.uleb128 0x3
+ 929 00ba 0E       		.uleb128 0xe
+ 930 00bb 3A       		.uleb128 0x3a
+ 931 00bc 0B       		.uleb128 0xb
+ 932 00bd 3B       		.uleb128 0x3b
+ 933 00be 0B       		.uleb128 0xb
+ 934 00bf 49       		.uleb128 0x49
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 23
+
+
+ 935 00c0 13       		.uleb128 0x13
+ 936 00c1 02       		.uleb128 0x2
+ 937 00c2 17       		.uleb128 0x17
+ 938 00c3 00       		.byte	0
+ 939 00c4 00       		.byte	0
+ 940 00c5 0E       		.uleb128 0xe
+ 941 00c6 0B       		.uleb128 0xb
+ 942 00c7 01       		.byte	0x1
+ 943 00c8 11       		.uleb128 0x11
+ 944 00c9 01       		.uleb128 0x1
+ 945 00ca 12       		.uleb128 0x12
+ 946 00cb 06       		.uleb128 0x6
+ 947 00cc 01       		.uleb128 0x1
+ 948 00cd 13       		.uleb128 0x13
+ 949 00ce 00       		.byte	0
+ 950 00cf 00       		.byte	0
+ 951 00d0 0F       		.uleb128 0xf
+ 952 00d1 898201   		.uleb128 0x4109
+ 953 00d4 00       		.byte	0
+ 954 00d5 11       		.uleb128 0x11
+ 955 00d6 01       		.uleb128 0x1
+ 956 00d7 31       		.uleb128 0x31
+ 957 00d8 13       		.uleb128 0x13
+ 958 00d9 00       		.byte	0
+ 959 00da 00       		.byte	0
+ 960 00db 10       		.uleb128 0x10
+ 961 00dc 2E       		.uleb128 0x2e
+ 962 00dd 01       		.byte	0x1
+ 963 00de 3F       		.uleb128 0x3f
+ 964 00df 19       		.uleb128 0x19
+ 965 00e0 03       		.uleb128 0x3
+ 966 00e1 0E       		.uleb128 0xe
+ 967 00e2 3A       		.uleb128 0x3a
+ 968 00e3 0B       		.uleb128 0xb
+ 969 00e4 3B       		.uleb128 0x3b
+ 970 00e5 0B       		.uleb128 0xb
+ 971 00e6 27       		.uleb128 0x27
+ 972 00e7 19       		.uleb128 0x19
+ 973 00e8 11       		.uleb128 0x11
+ 974 00e9 01       		.uleb128 0x1
+ 975 00ea 12       		.uleb128 0x12
+ 976 00eb 06       		.uleb128 0x6
+ 977 00ec 40       		.uleb128 0x40
+ 978 00ed 18       		.uleb128 0x18
+ 979 00ee 9742     		.uleb128 0x2117
+ 980 00f0 19       		.uleb128 0x19
+ 981 00f1 01       		.uleb128 0x1
+ 982 00f2 13       		.uleb128 0x13
+ 983 00f3 00       		.byte	0
+ 984 00f4 00       		.byte	0
+ 985 00f5 11       		.uleb128 0x11
+ 986 00f6 05       		.uleb128 0x5
+ 987 00f7 00       		.byte	0
+ 988 00f8 03       		.uleb128 0x3
+ 989 00f9 08       		.uleb128 0x8
+ 990 00fa 3A       		.uleb128 0x3a
+ 991 00fb 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 24
+
+
+ 992 00fc 3B       		.uleb128 0x3b
+ 993 00fd 0B       		.uleb128 0xb
+ 994 00fe 49       		.uleb128 0x49
+ 995 00ff 13       		.uleb128 0x13
+ 996 0100 02       		.uleb128 0x2
+ 997 0101 17       		.uleb128 0x17
+ 998 0102 00       		.byte	0
+ 999 0103 00       		.byte	0
+ 1000 0104 12       		.uleb128 0x12
+ 1001 0105 34       		.uleb128 0x34
+ 1002 0106 00       		.byte	0
+ 1003 0107 03       		.uleb128 0x3
+ 1004 0108 08       		.uleb128 0x8
+ 1005 0109 3A       		.uleb128 0x3a
+ 1006 010a 0B       		.uleb128 0xb
+ 1007 010b 3B       		.uleb128 0x3b
+ 1008 010c 0B       		.uleb128 0xb
+ 1009 010d 49       		.uleb128 0x49
+ 1010 010e 13       		.uleb128 0x13
+ 1011 010f 02       		.uleb128 0x2
+ 1012 0110 17       		.uleb128 0x17
+ 1013 0111 00       		.byte	0
+ 1014 0112 00       		.byte	0
+ 1015 0113 13       		.uleb128 0x13
+ 1016 0114 2E       		.uleb128 0x2e
+ 1017 0115 00       		.byte	0
+ 1018 0116 3F       		.uleb128 0x3f
+ 1019 0117 19       		.uleb128 0x19
+ 1020 0118 03       		.uleb128 0x3
+ 1021 0119 0E       		.uleb128 0xe
+ 1022 011a 3A       		.uleb128 0x3a
+ 1023 011b 0B       		.uleb128 0xb
+ 1024 011c 3B       		.uleb128 0x3b
+ 1025 011d 0B       		.uleb128 0xb
+ 1026 011e 27       		.uleb128 0x27
+ 1027 011f 19       		.uleb128 0x19
+ 1028 0120 49       		.uleb128 0x49
+ 1029 0121 13       		.uleb128 0x13
+ 1030 0122 11       		.uleb128 0x11
+ 1031 0123 01       		.uleb128 0x1
+ 1032 0124 12       		.uleb128 0x12
+ 1033 0125 06       		.uleb128 0x6
+ 1034 0126 40       		.uleb128 0x40
+ 1035 0127 18       		.uleb128 0x18
+ 1036 0128 9742     		.uleb128 0x2117
+ 1037 012a 19       		.uleb128 0x19
+ 1038 012b 00       		.byte	0
+ 1039 012c 00       		.byte	0
+ 1040 012d 14       		.uleb128 0x14
+ 1041 012e 2E       		.uleb128 0x2e
+ 1042 012f 00       		.byte	0
+ 1043 0130 3F       		.uleb128 0x3f
+ 1044 0131 19       		.uleb128 0x19
+ 1045 0132 03       		.uleb128 0x3
+ 1046 0133 0E       		.uleb128 0xe
+ 1047 0134 3A       		.uleb128 0x3a
+ 1048 0135 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 25
+
+
+ 1049 0136 3B       		.uleb128 0x3b
+ 1050 0137 0B       		.uleb128 0xb
+ 1051 0138 27       		.uleb128 0x27
+ 1052 0139 19       		.uleb128 0x19
+ 1053 013a 11       		.uleb128 0x11
+ 1054 013b 01       		.uleb128 0x1
+ 1055 013c 12       		.uleb128 0x12
+ 1056 013d 06       		.uleb128 0x6
+ 1057 013e 40       		.uleb128 0x40
+ 1058 013f 18       		.uleb128 0x18
+ 1059 0140 9742     		.uleb128 0x2117
+ 1060 0142 19       		.uleb128 0x19
+ 1061 0143 00       		.byte	0
+ 1062 0144 00       		.byte	0
+ 1063 0145 15       		.uleb128 0x15
+ 1064 0146 01       		.uleb128 0x1
+ 1065 0147 01       		.byte	0x1
+ 1066 0148 49       		.uleb128 0x49
+ 1067 0149 13       		.uleb128 0x13
+ 1068 014a 01       		.uleb128 0x1
+ 1069 014b 13       		.uleb128 0x13
+ 1070 014c 00       		.byte	0
+ 1071 014d 00       		.byte	0
+ 1072 014e 16       		.uleb128 0x16
+ 1073 014f 21       		.uleb128 0x21
+ 1074 0150 00       		.byte	0
+ 1075 0151 49       		.uleb128 0x49
+ 1076 0152 13       		.uleb128 0x13
+ 1077 0153 2F       		.uleb128 0x2f
+ 1078 0154 05       		.uleb128 0x5
+ 1079 0155 00       		.byte	0
+ 1080 0156 00       		.byte	0
+ 1081 0157 17       		.uleb128 0x17
+ 1082 0158 34       		.uleb128 0x34
+ 1083 0159 00       		.byte	0
+ 1084 015a 03       		.uleb128 0x3
+ 1085 015b 0E       		.uleb128 0xe
+ 1086 015c 3A       		.uleb128 0x3a
+ 1087 015d 0B       		.uleb128 0xb
+ 1088 015e 3B       		.uleb128 0x3b
+ 1089 015f 0B       		.uleb128 0xb
+ 1090 0160 49       		.uleb128 0x49
+ 1091 0161 13       		.uleb128 0x13
+ 1092 0162 1C       		.uleb128 0x1c
+ 1093 0163 0B       		.uleb128 0xb
+ 1094 0164 00       		.byte	0
+ 1095 0165 00       		.byte	0
+ 1096 0166 18       		.uleb128 0x18
+ 1097 0167 26       		.uleb128 0x26
+ 1098 0168 00       		.byte	0
+ 1099 0169 49       		.uleb128 0x49
+ 1100 016a 13       		.uleb128 0x13
+ 1101 016b 00       		.byte	0
+ 1102 016c 00       		.byte	0
+ 1103 016d 19       		.uleb128 0x19
+ 1104 016e 2E       		.uleb128 0x2e
+ 1105 016f 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 26
+
+
+ 1106 0170 3F       		.uleb128 0x3f
+ 1107 0171 19       		.uleb128 0x19
+ 1108 0172 3C       		.uleb128 0x3c
+ 1109 0173 19       		.uleb128 0x19
+ 1110 0174 6E       		.uleb128 0x6e
+ 1111 0175 0E       		.uleb128 0xe
+ 1112 0176 03       		.uleb128 0x3
+ 1113 0177 0E       		.uleb128 0xe
+ 1114 0178 3A       		.uleb128 0x3a
+ 1115 0179 0B       		.uleb128 0xb
+ 1116 017a 3B       		.uleb128 0x3b
+ 1117 017b 05       		.uleb128 0x5
+ 1118 017c 00       		.byte	0
+ 1119 017d 00       		.byte	0
+ 1120 017e 00       		.byte	0
+ 1121              		.section	.debug_loc,"",%progbits
+ 1122              	.Ldebug_loc0:
+ 1123              	.LLST0:
+ 1124 0000 00000000 		.4byte	.LVL2
+ 1125 0004 07000000 		.4byte	.LVL4-1
+ 1126 0008 0100     		.2byte	0x1
+ 1127 000a 50       		.byte	0x50
+ 1128 000b 07000000 		.4byte	.LVL4-1
+ 1129 000f 2A000000 		.4byte	.LVL7
+ 1130 0013 0100     		.2byte	0x1
+ 1131 0015 54       		.byte	0x54
+ 1132 0016 2A000000 		.4byte	.LVL7
+ 1133 001a 2C000000 		.4byte	.LVL8
+ 1134 001e 0600     		.2byte	0x6
+ 1135 0020 F3       		.byte	0xf3
+ 1136 0021 01       		.uleb128 0x1
+ 1137 0022 50       		.byte	0x50
+ 1138 0023 23       		.byte	0x23
+ 1139 0024 08       		.uleb128 0x8
+ 1140 0025 9F       		.byte	0x9f
+ 1141 0026 2C000000 		.4byte	.LVL8
+ 1142 002a 70000000 		.4byte	.LVL16
+ 1143 002e 0100     		.2byte	0x1
+ 1144 0030 54       		.byte	0x54
+ 1145 0031 70000000 		.4byte	.LVL16
+ 1146 0035 80000000 		.4byte	.LVL20
+ 1147 0039 0200     		.2byte	0x2
+ 1148 003b 73       		.byte	0x73
+ 1149 003c 04       		.sleb128 4
+ 1150 003d 8E000000 		.4byte	.LVL23
+ 1151 0041 94000000 		.4byte	.LVL25
+ 1152 0045 0100     		.2byte	0x1
+ 1153 0047 54       		.byte	0x54
+ 1154 0048 00000000 		.4byte	0
+ 1155 004c 00000000 		.4byte	0
+ 1156              	.LLST1:
+ 1157 0050 3C000000 		.4byte	.LVL10
+ 1158 0054 88000000 		.4byte	.LVL22
+ 1159 0058 0100     		.2byte	0x1
+ 1160 005a 53       		.byte	0x53
+ 1161 005b 92000000 		.4byte	.LVL24
+ 1162 005f 94000000 		.4byte	.LVL25
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 27
+
+
+ 1163 0063 0100     		.2byte	0x1
+ 1164 0065 53       		.byte	0x53
+ 1165 0066 00000000 		.4byte	0
+ 1166 006a 00000000 		.4byte	0
+ 1167              	.LLST2:
+ 1168 006e 36000000 		.4byte	.LVL9
+ 1169 0072 42000000 		.4byte	.LVL11
+ 1170 0076 0600     		.2byte	0x6
+ 1171 0078 03       		.byte	0x3
+ 1172 0079 00800000 		.4byte	xStart
+ 1173 007d 9F       		.byte	0x9f
+ 1174 007e 42000000 		.4byte	.LVL11
+ 1175 0082 44000000 		.4byte	.LVL12
+ 1176 0086 0100     		.2byte	0x1
+ 1177 0088 51       		.byte	0x51
+ 1178 0089 46000000 		.4byte	.LVL13
+ 1179 008d 72000000 		.4byte	.LVL17
+ 1180 0091 0100     		.2byte	0x1
+ 1181 0093 51       		.byte	0x51
+ 1182 0094 92000000 		.4byte	.LVL24
+ 1183 0098 94000000 		.4byte	.LVL25
+ 1184 009c 0100     		.2byte	0x1
+ 1185 009e 51       		.byte	0x51
+ 1186 009f 00000000 		.4byte	0
+ 1187 00a3 00000000 		.4byte	0
+ 1188              	.LLST3:
+ 1189 00a7 6A000000 		.4byte	.LVL15
+ 1190 00ab 82000000 		.4byte	.LVL21
+ 1191 00af 0100     		.2byte	0x1
+ 1192 00b1 56       		.byte	0x56
+ 1193 00b2 00000000 		.4byte	0
+ 1194 00b6 00000000 		.4byte	0
+ 1195              	.LLST4:
+ 1196 00ba 04000000 		.4byte	.LVL3
+ 1197 00be 5C000000 		.4byte	.LVL14
+ 1198 00c2 0200     		.2byte	0x2
+ 1199 00c4 30       		.byte	0x30
+ 1200 00c5 9F       		.byte	0x9f
+ 1201 00c6 5C000000 		.4byte	.LVL14
+ 1202 00ca 8E000000 		.4byte	.LVL23
+ 1203 00ce 0100     		.2byte	0x1
+ 1204 00d0 55       		.byte	0x55
+ 1205 00d1 8E000000 		.4byte	.LVL23
+ 1206 00d5 94000000 		.4byte	.LVL25
+ 1207 00d9 0200     		.2byte	0x2
+ 1208 00db 30       		.byte	0x30
+ 1209 00dc 9F       		.byte	0x9f
+ 1210 00dd 94000000 		.4byte	.LVL25
+ 1211 00e1 9C000000 		.4byte	.LVL27
+ 1212 00e5 0100     		.2byte	0x1
+ 1213 00e7 55       		.byte	0x55
+ 1214 00e8 9C000000 		.4byte	.LVL27
+ 1215 00ec AC000000 		.4byte	.LFE5
+ 1216 00f0 0100     		.2byte	0x1
+ 1217 00f2 50       		.byte	0x50
+ 1218 00f3 00000000 		.4byte	0
+ 1219 00f7 00000000 		.4byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 28
+
+
+ 1220              	.LLST5:
+ 1221 00fb 70000000 		.4byte	.LVL16
+ 1222 00ff 74000000 		.4byte	.LVL18
+ 1223 0103 0600     		.2byte	0x6
+ 1224 0105 03       		.byte	0x3
+ 1225 0106 00800000 		.4byte	xStart
+ 1226 010a 9F       		.byte	0x9f
+ 1227 010b 74000000 		.4byte	.LVL18
+ 1228 010f 82000000 		.4byte	.LVL21
+ 1229 0113 0100     		.2byte	0x1
+ 1230 0115 51       		.byte	0x51
+ 1231 0116 00000000 		.4byte	0
+ 1232 011a 00000000 		.4byte	0
+ 1233              	.LLST6:
+ 1234 011e 70000000 		.4byte	.LVL16
+ 1235 0122 82000000 		.4byte	.LVL21
+ 1236 0126 0100     		.2byte	0x1
+ 1237 0128 54       		.byte	0x54
+ 1238 0129 00000000 		.4byte	0
+ 1239 012d 00000000 		.4byte	0
+ 1240              	.LLST7:
+ 1241 0131 00000000 		.4byte	.LVL28
+ 1242 0135 0D000000 		.4byte	.LVL30-1
+ 1243 0139 0100     		.2byte	0x1
+ 1244 013b 50       		.byte	0x50
+ 1245 013c 0D000000 		.4byte	.LVL30-1
+ 1246 0140 38000000 		.4byte	.LVL36
+ 1247 0144 0100     		.2byte	0x1
+ 1248 0146 55       		.byte	0x55
+ 1249 0147 38000000 		.4byte	.LVL36
+ 1250 014b 44000000 		.4byte	.LFE6
+ 1251 014f 0100     		.2byte	0x1
+ 1252 0151 50       		.byte	0x50
+ 1253 0152 00000000 		.4byte	0
+ 1254 0156 00000000 		.4byte	0
+ 1255              	.LLST8:
+ 1256 015a 00000000 		.4byte	.LVL28
+ 1257 015e 0A000000 		.4byte	.LVL29
+ 1258 0162 0100     		.2byte	0x1
+ 1259 0164 50       		.byte	0x50
+ 1260 0165 0A000000 		.4byte	.LVL29
+ 1261 0169 38000000 		.4byte	.LVL36
+ 1262 016d 0100     		.2byte	0x1
+ 1263 016f 56       		.byte	0x56
+ 1264 0170 38000000 		.4byte	.LVL36
+ 1265 0174 44000000 		.4byte	.LFE6
+ 1266 0178 0100     		.2byte	0x1
+ 1267 017a 50       		.byte	0x50
+ 1268 017b 00000000 		.4byte	0
+ 1269 017f 00000000 		.4byte	0
+ 1270              	.LLST9:
+ 1271 0183 0A000000 		.4byte	.LVL29
+ 1272 0187 38000000 		.4byte	.LVL36
+ 1273 018b 0100     		.2byte	0x1
+ 1274 018d 56       		.byte	0x56
+ 1275 018e 00000000 		.4byte	0
+ 1276 0192 00000000 		.4byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 29
+
+
+ 1277              	.LLST10:
+ 1278 0196 12000000 		.4byte	.LVL31
+ 1279 019a 16000000 		.4byte	.LVL32
+ 1280 019e 0600     		.2byte	0x6
+ 1281 01a0 03       		.byte	0x3
+ 1282 01a1 00800000 		.4byte	xStart
+ 1283 01a5 9F       		.byte	0x9f
+ 1284 01a6 16000000 		.4byte	.LVL32
+ 1285 01aa 2C000000 		.4byte	.LVL34
+ 1286 01ae 0100     		.2byte	0x1
+ 1287 01b0 52       		.byte	0x52
+ 1288 01b1 00000000 		.4byte	0
+ 1289 01b5 00000000 		.4byte	0
+ 1290              	.LLST11:
+ 1291 01b9 12000000 		.4byte	.LVL31
+ 1292 01bd 38000000 		.4byte	.LVL36
+ 1293 01c1 0100     		.2byte	0x1
+ 1294 01c3 54       		.byte	0x54
+ 1295 01c4 00000000 		.4byte	0
+ 1296 01c8 00000000 		.4byte	0
+ 1297              		.section	.debug_aranges,"",%progbits
+ 1298 0000 3C000000 		.4byte	0x3c
+ 1299 0004 0200     		.2byte	0x2
+ 1300 0006 00000000 		.4byte	.Ldebug_info0
+ 1301 000a 04       		.byte	0x4
+ 1302 000b 00       		.byte	0
+ 1303 000c 0000     		.2byte	0
+ 1304 000e 0000     		.2byte	0
+ 1305 0010 00000000 		.4byte	.LFB9
+ 1306 0014 30000000 		.4byte	.LFE9-.LFB9
+ 1307 0018 00000000 		.4byte	.LFB5
+ 1308 001c AC000000 		.4byte	.LFE5-.LFB5
+ 1309 0020 00000000 		.4byte	.LFB6
+ 1310 0024 44000000 		.4byte	.LFE6-.LFB6
+ 1311 0028 00000000 		.4byte	.LFB7
+ 1312 002c 0C000000 		.4byte	.LFE7-.LFB7
+ 1313 0030 00000000 		.4byte	.LFB8
+ 1314 0034 02000000 		.4byte	.LFE8-.LFB8
+ 1315 0038 00000000 		.4byte	0
+ 1316 003c 00000000 		.4byte	0
+ 1317              		.section	.debug_ranges,"",%progbits
+ 1318              	.Ldebug_ranges0:
+ 1319 0000 00000000 		.4byte	.LFB9
+ 1320 0004 30000000 		.4byte	.LFE9
+ 1321 0008 00000000 		.4byte	.LFB5
+ 1322 000c AC000000 		.4byte	.LFE5
+ 1323 0010 00000000 		.4byte	.LFB6
+ 1324 0014 44000000 		.4byte	.LFE6
+ 1325 0018 00000000 		.4byte	.LFB7
+ 1326 001c 0C000000 		.4byte	.LFE7
+ 1327 0020 00000000 		.4byte	.LFB8
+ 1328 0024 02000000 		.4byte	.LFE8
+ 1329 0028 00000000 		.4byte	0
+ 1330 002c 00000000 		.4byte	0
+ 1331              		.section	.debug_line,"",%progbits
+ 1332              	.Ldebug_line0:
+ 1333 0000 4A020000 		.section	.debug_str,"MS",%progbits,1
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 30
+
+
+ 1333      02009B01 
+ 1333      00000201 
+ 1333      FB0E0D00 
+ 1333      01010101 
+ 1334              	.LASF5:
+ 1335 0000 5F5F7569 		.ascii	"__uint8_t\000"
+ 1335      6E74385F 
+ 1335      7400
+ 1336              	.LASF4:
+ 1337 000a 73697A65 		.ascii	"size_t\000"
+ 1337      5F7400
+ 1338              	.LASF38:
+ 1339 0011 76546173 		.ascii	"vTaskSuspendAll\000"
+ 1339      6B537573 
+ 1339      70656E64 
+ 1339      416C6C00 
+ 1340              	.LASF42:
+ 1341 0021 443A5C4E 		.ascii	"D:\\Notes 202324\\ELECH410\\Labs\\Lab3\\ex2_periodi"
+ 1341      6F746573 
+ 1341      20323032 
+ 1341      3332345C 
+ 1341      454C4543 
+ 1342 004f 63697479 		.ascii	"city\\periodicity.cydsn\000"
+ 1342      5C706572 
+ 1342      696F6469 
+ 1342      63697479 
+ 1342      2E637964 
+ 1343              	.LASF47:
+ 1344 0066 78506F72 		.ascii	"xPortGetFreeHeapSize\000"
+ 1344      74476574 
+ 1344      46726565 
+ 1344      48656170 
+ 1344      53697A65 
+ 1345              	.LASF43:
+ 1346 007b 415F424C 		.ascii	"A_BLOCK_LINK\000"
+ 1346      4F434B5F 
+ 1346      4C494E4B 
+ 1346      00
+ 1347              	.LASF41:
+ 1348 0088 46726565 		.ascii	"FreeRTOS\\src\\heap_2.c\000"
+ 1348      52544F53 
+ 1348      5C737263 
+ 1348      5C686561 
+ 1348      705F322E 
+ 1349              	.LASF44:
+ 1350 009e 70727648 		.ascii	"prvHeapInit\000"
+ 1350      65617049 
+ 1350      6E697400 
+ 1351              	.LASF39:
+ 1352 00aa 78546173 		.ascii	"xTaskResumeAll\000"
+ 1352      6B526573 
+ 1352      756D6541 
+ 1352      6C6C00
+ 1353              	.LASF22:
+ 1354 00b9 426C6F63 		.ascii	"BlockLink_t\000"
+ 1354      6B4C696E 
+ 1354      6B5F7400 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 31
+
+
+ 1355              	.LASF25:
+ 1356 00c5 7078426C 		.ascii	"pxBlock\000"
+ 1356      6F636B00 
+ 1357              	.LASF32:
+ 1358 00cd 70784C69 		.ascii	"pxLink\000"
+ 1358      6E6B00
+ 1359              	.LASF45:
+ 1360 00d4 7076506F 		.ascii	"pvPortMalloc\000"
+ 1360      72744D61 
+ 1360      6C6C6F63 
+ 1360      00
+ 1361              	.LASF23:
+ 1362 00e1 70784669 		.ascii	"pxFirstFreeBlock\000"
+ 1362      72737446 
+ 1362      72656542 
+ 1362      6C6F636B 
+ 1362      00
+ 1363              	.LASF33:
+ 1364 00f2 75634865 		.ascii	"ucHeap\000"
+ 1364      617000
+ 1365              	.LASF6:
+ 1366 00f9 756E7369 		.ascii	"unsigned char\000"
+ 1366      676E6564 
+ 1366      20636861 
+ 1366      7200
+ 1367              	.LASF40:
+ 1368 0107 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1368      43313120 
+ 1368      352E342E 
+ 1368      31203230 
+ 1368      31363036 
+ 1369 013a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1369      20726576 
+ 1369      6973696F 
+ 1369      6E203233 
+ 1369      37373135 
+ 1370 016d 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1370      66756E63 
+ 1370      74696F6E 
+ 1370      2D736563 
+ 1370      74696F6E 
+ 1371              	.LASF21:
+ 1372 0195 78426C6F 		.ascii	"xBlockSize\000"
+ 1372      636B5369 
+ 1372      7A6500
+ 1373              	.LASF12:
+ 1374 01a0 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1374      20756E73 
+ 1374      69676E65 
+ 1374      6420696E 
+ 1374      7400
+ 1375              	.LASF9:
+ 1376 01b2 73686F72 		.ascii	"short unsigned int\000"
+ 1376      7420756E 
+ 1376      7369676E 
+ 1376      65642069 
+ 1376      6E7400
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 32
+
+
+ 1377              	.LASF28:
+ 1378 01c5 78486561 		.ascii	"xHeapHasBeenInitialised\000"
+ 1378      70486173 
+ 1378      4265656E 
+ 1378      496E6974 
+ 1378      69616C69 
+ 1379              	.LASF36:
+ 1380 01dd 78456E64 		.ascii	"xEnd\000"
+ 1380      00
+ 1381              	.LASF8:
+ 1382 01e2 5F5F7569 		.ascii	"__uint16_t\000"
+ 1382      6E743136 
+ 1382      5F7400
+ 1383              	.LASF26:
+ 1384 01ed 70785072 		.ascii	"pxPreviousBlock\000"
+ 1384      6576696F 
+ 1384      7573426C 
+ 1384      6F636B00 
+ 1385              	.LASF46:
+ 1386 01fd 76506F72 		.ascii	"vPortFree\000"
+ 1386      74467265 
+ 1386      6500
+ 1387              	.LASF11:
+ 1388 0207 5F5F7569 		.ascii	"__uint32_t\000"
+ 1388      6E743332 
+ 1388      5F7400
+ 1389              	.LASF29:
+ 1390 0212 70765265 		.ascii	"pvReturn\000"
+ 1390      7475726E 
+ 1390      00
+ 1391              	.LASF34:
+ 1392 021b 68656170 		.ascii	"heapSTRUCT_SIZE\000"
+ 1392      53545255 
+ 1392      43545F53 
+ 1392      495A4500 
+ 1393              	.LASF35:
+ 1394 022b 78537461 		.ascii	"xStart\000"
+ 1394      727400
+ 1395              	.LASF48:
+ 1396 0232 76506F72 		.ascii	"vPortInitialiseBlocks\000"
+ 1396      74496E69 
+ 1396      7469616C 
+ 1396      69736542 
+ 1396      6C6F636B 
+ 1397              	.LASF0:
+ 1398 0248 756E7369 		.ascii	"unsigned int\000"
+ 1398      676E6564 
+ 1398      20696E74 
+ 1398      00
+ 1399              	.LASF13:
+ 1400 0255 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1400      206C6F6E 
+ 1400      6720756E 
+ 1400      7369676E 
+ 1400      65642069 
+ 1401              	.LASF16:
+ 1402 026c 75696E74 		.ascii	"uint8_t\000"
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 33
+
+
+ 1402      385F7400 
+ 1403              	.LASF27:
+ 1404 0274 70784E65 		.ascii	"pxNewBlockLink\000"
+ 1404      77426C6F 
+ 1404      636B4C69 
+ 1404      6E6B00
+ 1405              	.LASF14:
+ 1406 0283 73697A65 		.ascii	"sizetype\000"
+ 1406      74797065 
+ 1406      00
+ 1407              	.LASF1:
+ 1408 028c 6C6F6E67 		.ascii	"long long int\000"
+ 1408      206C6F6E 
+ 1408      6720696E 
+ 1408      7400
+ 1409              	.LASF31:
+ 1410 029a 7857616E 		.ascii	"xWantedSize\000"
+ 1410      74656453 
+ 1410      697A6500 
+ 1411              	.LASF15:
+ 1412 02a6 63686172 		.ascii	"char\000"
+ 1412      00
+ 1413              	.LASF24:
+ 1414 02ab 70756341 		.ascii	"pucAlignedHeap\000"
+ 1414      6C69676E 
+ 1414      65644865 
+ 1414      617000
+ 1415              	.LASF30:
+ 1416 02ba 70784974 		.ascii	"pxIterator\000"
+ 1416      65726174 
+ 1416      6F7200
+ 1417              	.LASF7:
+ 1418 02c5 73686F72 		.ascii	"short int\000"
+ 1418      7420696E 
+ 1418      7400
+ 1419              	.LASF17:
+ 1420 02cf 75696E74 		.ascii	"uint16_t\000"
+ 1420      31365F74 
+ 1420      00
+ 1421              	.LASF37:
+ 1422 02d8 78467265 		.ascii	"xFreeBytesRemaining\000"
+ 1422      65427974 
+ 1422      65735265 
+ 1422      6D61696E 
+ 1422      696E6700 
+ 1423              	.LASF18:
+ 1424 02ec 75696E74 		.ascii	"uint32_t\000"
+ 1424      33325F74 
+ 1424      00
+ 1425              	.LASF10:
+ 1426 02f5 6C6F6E67 		.ascii	"long int\000"
+ 1426      20696E74 
+ 1426      00
+ 1427              	.LASF2:
+ 1428 02fe 6C6F6E67 		.ascii	"long double\000"
+ 1428      20646F75 
+ 1428      626C6500 
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccFnmI1p.s 			page 34
+
+
+ 1429              	.LASF3:
+ 1430 030a 7369676E 		.ascii	"signed char\000"
+ 1430      65642063 
+ 1430      68617200 
+ 1431              	.LASF20:
+ 1432 0316 70784E65 		.ascii	"pxNextFreeBlock\000"
+ 1432      78744672 
+ 1432      6565426C 
+ 1432      6F636B00 
+ 1433              	.LASF19:
+ 1434 0326 42617365 		.ascii	"BaseType_t\000"
+ 1434      54797065 
+ 1434      5F7400
+ 1435              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

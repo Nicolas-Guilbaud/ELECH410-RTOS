@@ -1,0 +1,1370 @@
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.freeRTOSInit,"ax",%progbits
+  20              		.align	2
+  21              		.thumb
+  22              		.thumb_func
+  23              		.type	freeRTOSInit, %function
+  24              	freeRTOSInit:
+  25              	.LFB69:
+  26              		.file 1 "main.c"
+   1:main.c        **** /* ========================================
+   2:main.c        ****  *
+   3:main.c        ****  *              ELECH410 labs
+   4:main.c        ****  *          FreeRTOS example code
+   5:main.c        ****  * 
+   6:main.c        ****  *                   2019
+   7:main.c        ****  *
+   8:main.c        ****  * ========================================
+   9:main.c        **** */
+  10:main.c        **** #include "project.h"
+  11:main.c        **** 
+  12:main.c        **** /* RTOS includes. */
+  13:main.c        **** #include "FreeRTOS.h"
+  14:main.c        **** #include "task.h"
+  15:main.c        **** #include "timers.h"
+  16:main.c        **** #include "queue.h"
+  17:main.c        **** #include "semphr.h"
+  18:main.c        **** 
+  19:main.c        **** #define READ(name) name##_##Read()
+  20:main.c        **** #define WRITE(name,v) name##_##Write(v)
+  21:main.c        **** #define ANALYZE(name) WRITE(name,(READ(name)+1)%2);
+  22:main.c        **** 
+  23:main.c        **** 
+  24:main.c        **** #define TASK_STACK_SIZE      (1024)
+  25:main.c        **** 
+  26:main.c        **** /* Task definitions */
+  27:main.c        **** #define BLINKY_NAME           ("Blinky")
+  28:main.c        **** #define BLINKY_PRIORITY       (3)
+  29:main.c        **** #define BLINKY_PERIOD         (1000) // ticks
+  30:main.c        **** 
+  31:main.c        **** /* Task prototypes */
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 2
+
+
+  32:main.c        **** void blinkyTask( void * );
+  33:main.c        **** void blinkyTask2(void *);
+  34:main.c        **** 
+  35:main.c        **** /* Task handlers */
+  36:main.c        **** TaskHandle_t blinkyHandler;
+  37:main.c        **** 
+  38:main.c        **** /* Function prototypes */
+  39:main.c        **** /*
+  40:main.c        ****  * Installs the RTOS interrupt handlers.
+  41:main.c        ****  */
+  42:main.c        **** static void freeRTOSInit( void );
+  43:main.c        **** 
+  44:main.c        **** int main(void)
+  45:main.c        **** {
+  46:main.c        ****     /* Enable global interrupts. */
+  47:main.c        ****     CyGlobalIntEnable; 
+  48:main.c        **** 
+  49:main.c        ****     freeRTOSInit();
+  50:main.c        ****     
+  51:main.c        ****     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
+  52:main.c        ****     // ...
+  53:main.c        ****     
+  54:main.c        ****     // Create tasks
+  55:main.c        ****     xTaskCreate( blinkyTask, BLINKY_NAME, TASK_STACK_SIZE, NULL, BLINKY_PRIORITY, &blinkyHandler );
+  56:main.c        ****     xTaskCreate( blinkyTask2, ("Blinky2"), TASK_STACK_SIZE, NULL, BLINKY_PRIORITY, &blinkyHandler);
+  57:main.c        ****     
+  58:main.c        ****     // Launch freeRTOS
+  59:main.c        ****     vTaskStartScheduler();     
+  60:main.c        ****     
+  61:main.c        ****     for(;;)
+  62:main.c        ****     {
+  63:main.c        ****     }
+  64:main.c        **** }
+  65:main.c        **** 
+  66:main.c        **** void freeRTOSInit( void )
+  67:main.c        **** {
+  27              		.loc 1 67 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  68:main.c        **** /* Port layer functions that need to be copied into the vector table. */
+  69:main.c        **** extern void xPortPendSVHandler( void );
+  70:main.c        **** extern void xPortSysTickHandler( void );
+  71:main.c        **** extern void vPortSVCHandler( void );
+  72:main.c        **** extern cyisraddress CyRamVectors[];
+  73:main.c        **** 
+  74:main.c        **** 	/* Install the OS Interrupt Handlers. */
+  75:main.c        **** 	CyRamVectors[ 11 ] = ( cyisraddress ) vPortSVCHandler;
+  32              		.loc 1 75 0
+  33 0000 034B     		ldr	r3, .L2
+  34 0002 044A     		ldr	r2, .L2+4
+  35 0004 DA62     		str	r2, [r3, #44]
+  76:main.c        **** 	CyRamVectors[ 14 ] = ( cyisraddress ) xPortPendSVHandler;
+  36              		.loc 1 76 0
+  37 0006 044A     		ldr	r2, .L2+8
+  38 0008 9A63     		str	r2, [r3, #56]
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 3
+
+
+  77:main.c        **** 	CyRamVectors[ 15 ] = ( cyisraddress ) xPortSysTickHandler;
+  39              		.loc 1 77 0
+  40 000a 044A     		ldr	r2, .L2+12
+  41 000c DA63     		str	r2, [r3, #60]
+  42 000e 7047     		bx	lr
+  43              	.L3:
+  44              		.align	2
+  45              	.L2:
+  46 0010 00000000 		.word	CyRamVectors
+  47 0014 00000000 		.word	vPortSVCHandler
+  48 0018 00000000 		.word	xPortPendSVHandler
+  49 001c 00000000 		.word	xPortSysTickHandler
+  50              		.cfi_endproc
+  51              	.LFE69:
+  52              		.size	freeRTOSInit, .-freeRTOSInit
+  53              		.section	.text.blinkyTask,"ax",%progbits
+  54              		.align	2
+  55              		.global	blinkyTask
+  56              		.thumb
+  57              		.thumb_func
+  58              		.type	blinkyTask, %function
+  59              	blinkyTask:
+  60              	.LFB70:
+  78:main.c        **** }
+  79:main.c        **** 
+  80:main.c        **** void blinkyTask( void *arg )
+  81:main.c        **** {
+  61              		.loc 1 81 0
+  62              		.cfi_startproc
+  63              		@ Volatile: function does not return.
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66              	.LVL0:
+  67 0000 08B5     		push	{r3, lr}
+  68              		.cfi_def_cfa_offset 8
+  69              		.cfi_offset 3, -8
+  70              		.cfi_offset 14, -4
+  71              	.LVL1:
+  72              	.L6:
+  82:main.c        ****     (void)arg;
+  83:main.c        ****     
+  84:main.c        ****     for(;;)
+  85:main.c        ****     {
+  86:main.c        ****         vTaskDelay(BLINKY_PERIOD);
+  73              		.loc 1 86 0 discriminator 1
+  74 0002 4FF47A70 		mov	r0, #1000
+  75 0006 FFF7FEFF 		bl	vTaskDelay
+  76              	.LVL2:
+  87:main.c        ****         
+  88:main.c        ****         ANALYZE(LED1)
+  77              		.loc 1 88 0 discriminator 1
+  78 000a FFF7FEFF 		bl	LED1_Read
+  79              	.LVL3:
+  80 000e 0130     		adds	r0, r0, #1
+  81 0010 054B     		ldr	r3, .L8
+  82 0012 1840     		ands	r0, r0, r3
+  83 0014 03D5     		bpl	.L5
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 4
+
+
+  84 0016 0138     		subs	r0, r0, #1
+  85 0018 60F00100 		orn	r0, r0, #1
+  86 001c 0130     		adds	r0, r0, #1
+  87              	.L5:
+  88 001e C0B2     		uxtb	r0, r0
+  89 0020 FFF7FEFF 		bl	LED1_Write
+  90              	.LVL4:
+  91 0024 EDE7     		b	.L6
+  92              	.L9:
+  93 0026 00BF     		.align	2
+  94              	.L8:
+  95 0028 01000080 		.word	-2147483647
+  96              		.cfi_endproc
+  97              	.LFE70:
+  98              		.size	blinkyTask, .-blinkyTask
+  99              		.section	.text.blinkyTask2,"ax",%progbits
+ 100              		.align	2
+ 101              		.global	blinkyTask2
+ 102              		.thumb
+ 103              		.thumb_func
+ 104              		.type	blinkyTask2, %function
+ 105              	blinkyTask2:
+ 106              	.LFB71:
+  89:main.c        ****         
+  90:main.c        ****         
+  91:main.c        ****     }
+  92:main.c        **** }
+  93:main.c        **** 
+  94:main.c        **** void blinkyTask2(void *arg){
+ 107              		.loc 1 94 0
+ 108              		.cfi_startproc
+ 109              		@ Volatile: function does not return.
+ 110              		@ args = 0, pretend = 0, frame = 0
+ 111              		@ frame_needed = 0, uses_anonymous_args = 0
+ 112              	.LVL5:
+ 113 0000 08B5     		push	{r3, lr}
+ 114              		.cfi_def_cfa_offset 8
+ 115              		.cfi_offset 3, -8
+ 116              		.cfi_offset 14, -4
+ 117              	.LVL6:
+ 118              	.L12:
+  95:main.c        ****     (void) arg;
+  96:main.c        ****     
+  97:main.c        ****     for(;;){
+  98:main.c        ****         vTaskDelay(BLINKY_PERIOD/2);
+ 119              		.loc 1 98 0 discriminator 1
+ 120 0002 4FF4FA70 		mov	r0, #500
+ 121 0006 FFF7FEFF 		bl	vTaskDelay
+ 122              	.LVL7:
+  99:main.c        ****         
+ 100:main.c        ****         ANALYZE(LED2);
+ 123              		.loc 1 100 0 discriminator 1
+ 124 000a FFF7FEFF 		bl	LED2_Read
+ 125              	.LVL8:
+ 126 000e 0130     		adds	r0, r0, #1
+ 127 0010 054B     		ldr	r3, .L14
+ 128 0012 1840     		ands	r0, r0, r3
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 5
+
+
+ 129 0014 03D5     		bpl	.L11
+ 130 0016 0138     		subs	r0, r0, #1
+ 131 0018 60F00100 		orn	r0, r0, #1
+ 132 001c 0130     		adds	r0, r0, #1
+ 133              	.L11:
+ 134 001e C0B2     		uxtb	r0, r0
+ 135 0020 FFF7FEFF 		bl	LED2_Write
+ 136              	.LVL9:
+ 137 0024 EDE7     		b	.L12
+ 138              	.L15:
+ 139 0026 00BF     		.align	2
+ 140              	.L14:
+ 141 0028 01000080 		.word	-2147483647
+ 142              		.cfi_endproc
+ 143              	.LFE71:
+ 144              		.size	blinkyTask2, .-blinkyTask2
+ 145              		.section	.text.main,"ax",%progbits
+ 146              		.align	2
+ 147              		.global	main
+ 148              		.thumb
+ 149              		.thumb_func
+ 150              		.type	main, %function
+ 151              	main:
+ 152              	.LFB68:
+  45:main.c        ****     /* Enable global interrupts. */
+ 153              		.loc 1 45 0
+ 154              		.cfi_startproc
+ 155              		@ Volatile: function does not return.
+ 156              		@ args = 0, pretend = 0, frame = 0
+ 157              		@ frame_needed = 0, uses_anonymous_args = 0
+ 158 0000 00B5     		push	{lr}
+ 159              		.cfi_def_cfa_offset 4
+ 160              		.cfi_offset 14, -4
+ 161 0002 83B0     		sub	sp, sp, #12
+ 162              		.cfi_def_cfa_offset 16
+  47:main.c        **** 
+ 163              		.loc 1 47 0
+ 164              		.syntax unified
+ 165              	@ 47 "main.c" 1
+ 166 0004 62B6     		CPSIE   i
+ 167              	@ 0 "" 2
+  49:main.c        ****     
+ 168              		.loc 1 49 0
+ 169              		.thumb
+ 170              		.syntax unified
+ 171 0006 FFF7FEFF 		bl	freeRTOSInit
+ 172              	.LVL10:
+  55:main.c        ****     xTaskCreate( blinkyTask2, ("Blinky2"), TASK_STACK_SIZE, NULL, BLINKY_PRIORITY, &blinkyHandler);
+ 173              		.loc 1 55 0
+ 174 000a 0B4D     		ldr	r5, .L19
+ 175 000c 0195     		str	r5, [sp, #4]
+ 176 000e 0324     		movs	r4, #3
+ 177 0010 0094     		str	r4, [sp]
+ 178 0012 0023     		movs	r3, #0
+ 179 0014 4FF48062 		mov	r2, #1024
+ 180 0018 0849     		ldr	r1, .L19+4
+ 181 001a 0948     		ldr	r0, .L19+8
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 6
+
+
+ 182 001c FFF7FEFF 		bl	xTaskCreate
+ 183              	.LVL11:
+  56:main.c        ****     
+ 184              		.loc 1 56 0
+ 185 0020 0195     		str	r5, [sp, #4]
+ 186 0022 0094     		str	r4, [sp]
+ 187 0024 0023     		movs	r3, #0
+ 188 0026 4FF48062 		mov	r2, #1024
+ 189 002a 0649     		ldr	r1, .L19+12
+ 190 002c 0648     		ldr	r0, .L19+16
+ 191 002e FFF7FEFF 		bl	xTaskCreate
+ 192              	.LVL12:
+  59:main.c        ****     
+ 193              		.loc 1 59 0
+ 194 0032 FFF7FEFF 		bl	vTaskStartScheduler
+ 195              	.LVL13:
+ 196              	.L17:
+ 197 0036 FEE7     		b	.L17
+ 198              	.L20:
+ 199              		.align	2
+ 200              	.L19:
+ 201 0038 00000000 		.word	blinkyHandler
+ 202 003c 00000000 		.word	.LC0
+ 203 0040 00000000 		.word	blinkyTask
+ 204 0044 08000000 		.word	.LC1
+ 205 0048 00000000 		.word	blinkyTask2
+ 206              		.cfi_endproc
+ 207              	.LFE68:
+ 208              		.size	main, .-main
+ 209              		.comm	blinkyHandler,4,4
+ 210              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 211              		.align	2
+ 212              	.LC0:
+ 213 0000 426C696E 		.ascii	"Blinky\000"
+ 213      6B7900
+ 214 0007 00       		.space	1
+ 215              	.LC1:
+ 216 0008 426C696E 		.ascii	"Blinky2\000"
+ 216      6B793200 
+ 217              		.text
+ 218              	.Letext0:
+ 219              		.file 2 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 220              		.file 3 "d:\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.1\\arm-none-eabi\\inc
+ 221              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 222              		.file 5 ".\\FreeRTOS\\include/task.h"
+ 223              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 224              		.file 7 "Generated_Source\\PSoC5/LED1.h"
+ 225              		.file 8 "Generated_Source\\PSoC5/LED2.h"
+ 226              		.section	.debug_info,"",%progbits
+ 227              	.Ldebug_info0:
+ 228 0000 C2020000 		.4byte	0x2c2
+ 229 0004 0400     		.2byte	0x4
+ 230 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 231 000a 04       		.byte	0x4
+ 232 000b 01       		.uleb128 0x1
+ 233 000c 67000000 		.4byte	.LASF33
+ 234 0010 0C       		.byte	0xc
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 7
+
+
+ 235 0011 17020000 		.4byte	.LASF34
+ 236 0015 1A010000 		.4byte	.LASF35
+ 237 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 238 001d 00000000 		.4byte	0
+ 239 0021 00000000 		.4byte	.Ldebug_line0
+ 240 0025 02       		.uleb128 0x2
+ 241 0026 01       		.byte	0x1
+ 242 0027 06       		.byte	0x6
+ 243 0028 80020000 		.4byte	.LASF0
+ 244 002c 02       		.uleb128 0x2
+ 245 002d 01       		.byte	0x1
+ 246 002e 08       		.byte	0x8
+ 247 002f 59000000 		.4byte	.LASF1
+ 248 0033 02       		.uleb128 0x2
+ 249 0034 02       		.byte	0x2
+ 250 0035 05       		.byte	0x5
+ 251 0036 49020000 		.4byte	.LASF2
+ 252 003a 02       		.uleb128 0x2
+ 253 003b 02       		.byte	0x2
+ 254 003c 07       		.byte	0x7
+ 255 003d 07010000 		.4byte	.LASF3
+ 256 0041 03       		.uleb128 0x3
+ 257 0042 18000000 		.4byte	.LASF9
+ 258 0046 02       		.byte	0x2
+ 259 0047 3F       		.byte	0x3f
+ 260 0048 4C000000 		.4byte	0x4c
+ 261 004c 02       		.uleb128 0x2
+ 262 004d 04       		.byte	0x4
+ 263 004e 05       		.byte	0x5
+ 264 004f 60020000 		.4byte	.LASF4
+ 265 0053 02       		.uleb128 0x2
+ 266 0054 04       		.byte	0x4
+ 267 0055 07       		.byte	0x7
+ 268 0056 F5000000 		.4byte	.LASF5
+ 269 005a 02       		.uleb128 0x2
+ 270 005b 08       		.byte	0x8
+ 271 005c 05       		.byte	0x5
+ 272 005d 09020000 		.4byte	.LASF6
+ 273 0061 02       		.uleb128 0x2
+ 274 0062 08       		.byte	0x8
+ 275 0063 07       		.byte	0x7
+ 276 0064 BC010000 		.4byte	.LASF7
+ 277 0068 04       		.uleb128 0x4
+ 278 0069 04       		.byte	0x4
+ 279 006a 05       		.byte	0x5
+ 280 006b 696E7400 		.ascii	"int\000"
+ 281 006f 02       		.uleb128 0x2
+ 282 0070 04       		.byte	0x4
+ 283 0071 07       		.byte	0x7
+ 284 0072 AF010000 		.4byte	.LASF8
+ 285 0076 03       		.uleb128 0x3
+ 286 0077 F8010000 		.4byte	.LASF10
+ 287 007b 03       		.byte	0x3
+ 288 007c 2C       		.byte	0x2c
+ 289 007d 41000000 		.4byte	0x41
+ 290 0081 02       		.uleb128 0x2
+ 291 0082 04       		.byte	0x4
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 8
+
+
+ 292 0083 04       		.byte	0x4
+ 293 0084 53000000 		.4byte	.LASF11
+ 294 0088 02       		.uleb128 0x2
+ 295 0089 08       		.byte	0x8
+ 296 008a 04       		.byte	0x4
+ 297 008b 6E010000 		.4byte	.LASF12
+ 298 008f 02       		.uleb128 0x2
+ 299 0090 01       		.byte	0x1
+ 300 0091 08       		.byte	0x8
+ 301 0092 1E020000 		.4byte	.LASF13
+ 302 0096 05       		.uleb128 0x5
+ 303 0097 EB010000 		.4byte	.LASF14
+ 304 009b 04       		.byte	0x4
+ 305 009c A402     		.2byte	0x2a4
+ 306 009e A2000000 		.4byte	0xa2
+ 307 00a2 06       		.uleb128 0x6
+ 308 00a3 04       		.byte	0x4
+ 309 00a4 A8000000 		.4byte	0xa8
+ 310 00a8 07       		.uleb128 0x7
+ 311 00a9 02       		.uleb128 0x2
+ 312 00aa 04       		.byte	0x4
+ 313 00ab 07       		.byte	0x7
+ 314 00ac 00020000 		.4byte	.LASF15
+ 315 00b0 02       		.uleb128 0x2
+ 316 00b1 08       		.byte	0x8
+ 317 00b2 04       		.byte	0x4
+ 318 00b3 74020000 		.4byte	.LASF16
+ 319 00b7 08       		.uleb128 0x8
+ 320 00b8 04       		.byte	0x4
+ 321 00b9 03       		.uleb128 0x3
+ 322 00ba 53020000 		.4byte	.LASF17
+ 323 00be 05       		.byte	0x5
+ 324 00bf 3E       		.byte	0x3e
+ 325 00c0 C4000000 		.4byte	0xc4
+ 326 00c4 06       		.uleb128 0x6
+ 327 00c5 04       		.byte	0x4
+ 328 00c6 CA000000 		.4byte	0xca
+ 329 00ca 09       		.uleb128 0x9
+ 330 00cb 87010000 		.4byte	.LASF36
+ 331 00cf 0A       		.uleb128 0xa
+ 332 00d0 75010000 		.4byte	.LASF37
+ 333 00d4 01       		.byte	0x1
+ 334 00d5 42       		.byte	0x42
+ 335 00d6 00000000 		.4byte	.LFB69
+ 336 00da 20000000 		.4byte	.LFE69-.LFB69
+ 337 00de 01       		.uleb128 0x1
+ 338 00df 9C       		.byte	0x9c
+ 339 00e0 05010000 		.4byte	0x105
+ 340 00e4 0B       		.uleb128 0xb
+ 341 00e5 40000000 		.4byte	.LASF18
+ 342 00e9 01       		.byte	0x1
+ 343 00ea 45       		.byte	0x45
+ 344 00eb 0B       		.uleb128 0xb
+ 345 00ec 9B010000 		.4byte	.LASF19
+ 346 00f0 01       		.byte	0x1
+ 347 00f1 46       		.byte	0x46
+ 348 00f2 0B       		.uleb128 0xb
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 9
+
+
+ 349 00f3 23020000 		.4byte	.LASF20
+ 350 00f7 01       		.byte	0x1
+ 351 00f8 47       		.byte	0x47
+ 352 00f9 0C       		.uleb128 0xc
+ 353 00fa 0B000000 		.4byte	.LASF23
+ 354 00fe 01       		.byte	0x1
+ 355 00ff 48       		.byte	0x48
+ 356 0100 05010000 		.4byte	0x105
+ 357 0104 00       		.byte	0
+ 358 0105 0D       		.uleb128 0xd
+ 359 0106 96000000 		.4byte	0x96
+ 360 010a 10010000 		.4byte	0x110
+ 361 010e 0E       		.uleb128 0xe
+ 362 010f 00       		.byte	0
+ 363 0110 0F       		.uleb128 0xf
+ 364 0111 3E020000 		.4byte	.LASF21
+ 365 0115 01       		.byte	0x1
+ 366 0116 50       		.byte	0x50
+ 367 0117 00000000 		.4byte	.LFB70
+ 368 011b 2C000000 		.4byte	.LFE70-.LFB70
+ 369 011f 01       		.uleb128 0x1
+ 370 0120 9C       		.byte	0x9c
+ 371 0121 5C010000 		.4byte	0x15c
+ 372 0125 10       		.uleb128 0x10
+ 373 0126 61726700 		.ascii	"arg\000"
+ 374 012a 01       		.byte	0x1
+ 375 012b 50       		.byte	0x50
+ 376 012c B7000000 		.4byte	0xb7
+ 377 0130 00000000 		.4byte	.LLST0
+ 378 0134 11       		.uleb128 0x11
+ 379 0135 0A000000 		.4byte	.LVL2
+ 380 0139 75020000 		.4byte	0x275
+ 381 013d 49010000 		.4byte	0x149
+ 382 0141 12       		.uleb128 0x12
+ 383 0142 01       		.uleb128 0x1
+ 384 0143 50       		.byte	0x50
+ 385 0144 03       		.uleb128 0x3
+ 386 0145 0A       		.byte	0xa
+ 387 0146 E803     		.2byte	0x3e8
+ 388 0148 00       		.byte	0
+ 389 0149 13       		.uleb128 0x13
+ 390 014a 0E000000 		.4byte	.LVL3
+ 391 014e 81020000 		.4byte	0x281
+ 392 0152 13       		.uleb128 0x13
+ 393 0153 24000000 		.4byte	.LVL4
+ 394 0157 8C020000 		.4byte	0x28c
+ 395 015b 00       		.byte	0
+ 396 015c 0F       		.uleb128 0xf
+ 397 015d 55010000 		.4byte	.LASF22
+ 398 0161 01       		.byte	0x1
+ 399 0162 5E       		.byte	0x5e
+ 400 0163 00000000 		.4byte	.LFB71
+ 401 0167 2C000000 		.4byte	.LFE71-.LFB71
+ 402 016b 01       		.uleb128 0x1
+ 403 016c 9C       		.byte	0x9c
+ 404 016d A8010000 		.4byte	0x1a8
+ 405 0171 10       		.uleb128 0x10
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 10
+
+
+ 406 0172 61726700 		.ascii	"arg\000"
+ 407 0176 01       		.byte	0x1
+ 408 0177 5E       		.byte	0x5e
+ 409 0178 B7000000 		.4byte	0xb7
+ 410 017c 21000000 		.4byte	.LLST1
+ 411 0180 11       		.uleb128 0x11
+ 412 0181 0A000000 		.4byte	.LVL7
+ 413 0185 75020000 		.4byte	0x275
+ 414 0189 95010000 		.4byte	0x195
+ 415 018d 12       		.uleb128 0x12
+ 416 018e 01       		.uleb128 0x1
+ 417 018f 50       		.byte	0x50
+ 418 0190 03       		.uleb128 0x3
+ 419 0191 0A       		.byte	0xa
+ 420 0192 F401     		.2byte	0x1f4
+ 421 0194 00       		.byte	0
+ 422 0195 13       		.uleb128 0x13
+ 423 0196 0E000000 		.4byte	.LVL8
+ 424 019a 97020000 		.4byte	0x297
+ 425 019e 13       		.uleb128 0x13
+ 426 019f 24000000 		.4byte	.LVL9
+ 427 01a3 A2020000 		.4byte	0x2a2
+ 428 01a7 00       		.byte	0
+ 429 01a8 14       		.uleb128 0x14
+ 430 01a9 82010000 		.4byte	.LASF38
+ 431 01ad 01       		.byte	0x1
+ 432 01ae 2C       		.byte	0x2c
+ 433 01af 68000000 		.4byte	0x68
+ 434 01b3 00000000 		.4byte	.LFB68
+ 435 01b7 4C000000 		.4byte	.LFE68-.LFB68
+ 436 01bb 01       		.uleb128 0x1
+ 437 01bc 9C       		.byte	0x9c
+ 438 01bd 48020000 		.4byte	0x248
+ 439 01c1 13       		.uleb128 0x13
+ 440 01c2 0A000000 		.4byte	.LVL10
+ 441 01c6 CF000000 		.4byte	0xcf
+ 442 01ca 11       		.uleb128 0x11
+ 443 01cb 20000000 		.4byte	.LVL11
+ 444 01cf AD020000 		.4byte	0x2ad
+ 445 01d3 04020000 		.4byte	0x204
+ 446 01d7 12       		.uleb128 0x12
+ 447 01d8 01       		.uleb128 0x1
+ 448 01d9 50       		.byte	0x50
+ 449 01da 05       		.uleb128 0x5
+ 450 01db 03       		.byte	0x3
+ 451 01dc 00000000 		.4byte	blinkyTask
+ 452 01e0 12       		.uleb128 0x12
+ 453 01e1 01       		.uleb128 0x1
+ 454 01e2 51       		.byte	0x51
+ 455 01e3 05       		.uleb128 0x5
+ 456 01e4 03       		.byte	0x3
+ 457 01e5 00000000 		.4byte	.LC0
+ 458 01e9 12       		.uleb128 0x12
+ 459 01ea 01       		.uleb128 0x1
+ 460 01eb 52       		.byte	0x52
+ 461 01ec 03       		.uleb128 0x3
+ 462 01ed 0A       		.byte	0xa
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 11
+
+
+ 463 01ee 0004     		.2byte	0x400
+ 464 01f0 12       		.uleb128 0x12
+ 465 01f1 01       		.uleb128 0x1
+ 466 01f2 53       		.byte	0x53
+ 467 01f3 01       		.uleb128 0x1
+ 468 01f4 30       		.byte	0x30
+ 469 01f5 12       		.uleb128 0x12
+ 470 01f6 02       		.uleb128 0x2
+ 471 01f7 7D       		.byte	0x7d
+ 472 01f8 00       		.sleb128 0
+ 473 01f9 02       		.uleb128 0x2
+ 474 01fa 74       		.byte	0x74
+ 475 01fb 00       		.sleb128 0
+ 476 01fc 12       		.uleb128 0x12
+ 477 01fd 02       		.uleb128 0x2
+ 478 01fe 7D       		.byte	0x7d
+ 479 01ff 04       		.sleb128 4
+ 480 0200 02       		.uleb128 0x2
+ 481 0201 75       		.byte	0x75
+ 482 0202 00       		.sleb128 0
+ 483 0203 00       		.byte	0
+ 484 0204 11       		.uleb128 0x11
+ 485 0205 32000000 		.4byte	.LVL12
+ 486 0209 AD020000 		.4byte	0x2ad
+ 487 020d 3E020000 		.4byte	0x23e
+ 488 0211 12       		.uleb128 0x12
+ 489 0212 01       		.uleb128 0x1
+ 490 0213 50       		.byte	0x50
+ 491 0214 05       		.uleb128 0x5
+ 492 0215 03       		.byte	0x3
+ 493 0216 00000000 		.4byte	blinkyTask2
+ 494 021a 12       		.uleb128 0x12
+ 495 021b 01       		.uleb128 0x1
+ 496 021c 51       		.byte	0x51
+ 497 021d 05       		.uleb128 0x5
+ 498 021e 03       		.byte	0x3
+ 499 021f 08000000 		.4byte	.LC1
+ 500 0223 12       		.uleb128 0x12
+ 501 0224 01       		.uleb128 0x1
+ 502 0225 52       		.byte	0x52
+ 503 0226 03       		.uleb128 0x3
+ 504 0227 0A       		.byte	0xa
+ 505 0228 0004     		.2byte	0x400
+ 506 022a 12       		.uleb128 0x12
+ 507 022b 01       		.uleb128 0x1
+ 508 022c 53       		.byte	0x53
+ 509 022d 01       		.uleb128 0x1
+ 510 022e 30       		.byte	0x30
+ 511 022f 12       		.uleb128 0x12
+ 512 0230 02       		.uleb128 0x2
+ 513 0231 7D       		.byte	0x7d
+ 514 0232 00       		.sleb128 0
+ 515 0233 02       		.uleb128 0x2
+ 516 0234 74       		.byte	0x74
+ 517 0235 00       		.sleb128 0
+ 518 0236 12       		.uleb128 0x12
+ 519 0237 02       		.uleb128 0x2
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 12
+
+
+ 520 0238 7D       		.byte	0x7d
+ 521 0239 04       		.sleb128 4
+ 522 023a 02       		.uleb128 0x2
+ 523 023b 75       		.byte	0x75
+ 524 023c 00       		.sleb128 0
+ 525 023d 00       		.byte	0
+ 526 023e 13       		.uleb128 0x13
+ 527 023f 36000000 		.4byte	.LVL13
+ 528 0243 B9020000 		.4byte	0x2b9
+ 529 0247 00       		.byte	0
+ 530 0248 15       		.uleb128 0x15
+ 531 0249 61010000 		.4byte	.LASF24
+ 532 024d 06       		.byte	0x6
+ 533 024e 1207     		.2byte	0x712
+ 534 0250 54020000 		.4byte	0x254
+ 535 0254 16       		.uleb128 0x16
+ 536 0255 76000000 		.4byte	0x76
+ 537 0259 17       		.uleb128 0x17
+ 538 025a D3010000 		.4byte	.LASF25
+ 539 025e 01       		.byte	0x1
+ 540 025f 24       		.byte	0x24
+ 541 0260 B9000000 		.4byte	0xb9
+ 542 0264 05       		.uleb128 0x5
+ 543 0265 03       		.byte	0x3
+ 544 0266 00000000 		.4byte	blinkyHandler
+ 545 026a 0C       		.uleb128 0xc
+ 546 026b 0B000000 		.4byte	.LASF23
+ 547 026f 01       		.byte	0x1
+ 548 0270 48       		.byte	0x48
+ 549 0271 05010000 		.4byte	0x105
+ 550 0275 18       		.uleb128 0x18
+ 551 0276 69020000 		.4byte	.LASF26
+ 552 027a 69020000 		.4byte	.LASF26
+ 553 027e 05       		.byte	0x5
+ 554 027f EE02     		.2byte	0x2ee
+ 555 0281 19       		.uleb128 0x19
+ 556 0282 22000000 		.4byte	.LASF27
+ 557 0286 22000000 		.4byte	.LASF27
+ 558 028a 07       		.byte	0x7
+ 559 028b 29       		.byte	0x29
+ 560 028c 19       		.uleb128 0x19
+ 561 028d 00000000 		.4byte	.LASF28
+ 562 0291 00000000 		.4byte	.LASF28
+ 563 0295 07       		.byte	0x7
+ 564 0296 26       		.byte	0x26
+ 565 0297 19       		.uleb128 0x19
+ 566 0298 E1010000 		.4byte	.LASF29
+ 567 029c E1010000 		.4byte	.LASF29
+ 568 02a0 08       		.byte	0x8
+ 569 02a1 29       		.byte	0x29
+ 570 02a2 19       		.uleb128 0x19
+ 571 02a3 33020000 		.4byte	.LASF30
+ 572 02a7 33020000 		.4byte	.LASF30
+ 573 02ab 08       		.byte	0x8
+ 574 02ac 26       		.byte	0x26
+ 575 02ad 18       		.uleb128 0x18
+ 576 02ae 8C020000 		.4byte	.LASF31
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 13
+
+
+ 577 02b2 8C020000 		.4byte	.LASF31
+ 578 02b6 05       		.byte	0x5
+ 579 02b7 4201     		.2byte	0x142
+ 580 02b9 18       		.uleb128 0x18
+ 581 02ba 2C000000 		.4byte	.LASF32
+ 582 02be 2C000000 		.4byte	.LASF32
+ 583 02c2 05       		.byte	0x5
+ 584 02c3 8F04     		.2byte	0x48f
+ 585 02c5 00       		.byte	0
+ 586              		.section	.debug_abbrev,"",%progbits
+ 587              	.Ldebug_abbrev0:
+ 588 0000 01       		.uleb128 0x1
+ 589 0001 11       		.uleb128 0x11
+ 590 0002 01       		.byte	0x1
+ 591 0003 25       		.uleb128 0x25
+ 592 0004 0E       		.uleb128 0xe
+ 593 0005 13       		.uleb128 0x13
+ 594 0006 0B       		.uleb128 0xb
+ 595 0007 03       		.uleb128 0x3
+ 596 0008 0E       		.uleb128 0xe
+ 597 0009 1B       		.uleb128 0x1b
+ 598 000a 0E       		.uleb128 0xe
+ 599 000b 55       		.uleb128 0x55
+ 600 000c 17       		.uleb128 0x17
+ 601 000d 11       		.uleb128 0x11
+ 602 000e 01       		.uleb128 0x1
+ 603 000f 10       		.uleb128 0x10
+ 604 0010 17       		.uleb128 0x17
+ 605 0011 00       		.byte	0
+ 606 0012 00       		.byte	0
+ 607 0013 02       		.uleb128 0x2
+ 608 0014 24       		.uleb128 0x24
+ 609 0015 00       		.byte	0
+ 610 0016 0B       		.uleb128 0xb
+ 611 0017 0B       		.uleb128 0xb
+ 612 0018 3E       		.uleb128 0x3e
+ 613 0019 0B       		.uleb128 0xb
+ 614 001a 03       		.uleb128 0x3
+ 615 001b 0E       		.uleb128 0xe
+ 616 001c 00       		.byte	0
+ 617 001d 00       		.byte	0
+ 618 001e 03       		.uleb128 0x3
+ 619 001f 16       		.uleb128 0x16
+ 620 0020 00       		.byte	0
+ 621 0021 03       		.uleb128 0x3
+ 622 0022 0E       		.uleb128 0xe
+ 623 0023 3A       		.uleb128 0x3a
+ 624 0024 0B       		.uleb128 0xb
+ 625 0025 3B       		.uleb128 0x3b
+ 626 0026 0B       		.uleb128 0xb
+ 627 0027 49       		.uleb128 0x49
+ 628 0028 13       		.uleb128 0x13
+ 629 0029 00       		.byte	0
+ 630 002a 00       		.byte	0
+ 631 002b 04       		.uleb128 0x4
+ 632 002c 24       		.uleb128 0x24
+ 633 002d 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 14
+
+
+ 634 002e 0B       		.uleb128 0xb
+ 635 002f 0B       		.uleb128 0xb
+ 636 0030 3E       		.uleb128 0x3e
+ 637 0031 0B       		.uleb128 0xb
+ 638 0032 03       		.uleb128 0x3
+ 639 0033 08       		.uleb128 0x8
+ 640 0034 00       		.byte	0
+ 641 0035 00       		.byte	0
+ 642 0036 05       		.uleb128 0x5
+ 643 0037 16       		.uleb128 0x16
+ 644 0038 00       		.byte	0
+ 645 0039 03       		.uleb128 0x3
+ 646 003a 0E       		.uleb128 0xe
+ 647 003b 3A       		.uleb128 0x3a
+ 648 003c 0B       		.uleb128 0xb
+ 649 003d 3B       		.uleb128 0x3b
+ 650 003e 05       		.uleb128 0x5
+ 651 003f 49       		.uleb128 0x49
+ 652 0040 13       		.uleb128 0x13
+ 653 0041 00       		.byte	0
+ 654 0042 00       		.byte	0
+ 655 0043 06       		.uleb128 0x6
+ 656 0044 0F       		.uleb128 0xf
+ 657 0045 00       		.byte	0
+ 658 0046 0B       		.uleb128 0xb
+ 659 0047 0B       		.uleb128 0xb
+ 660 0048 49       		.uleb128 0x49
+ 661 0049 13       		.uleb128 0x13
+ 662 004a 00       		.byte	0
+ 663 004b 00       		.byte	0
+ 664 004c 07       		.uleb128 0x7
+ 665 004d 15       		.uleb128 0x15
+ 666 004e 00       		.byte	0
+ 667 004f 27       		.uleb128 0x27
+ 668 0050 19       		.uleb128 0x19
+ 669 0051 00       		.byte	0
+ 670 0052 00       		.byte	0
+ 671 0053 08       		.uleb128 0x8
+ 672 0054 0F       		.uleb128 0xf
+ 673 0055 00       		.byte	0
+ 674 0056 0B       		.uleb128 0xb
+ 675 0057 0B       		.uleb128 0xb
+ 676 0058 00       		.byte	0
+ 677 0059 00       		.byte	0
+ 678 005a 09       		.uleb128 0x9
+ 679 005b 13       		.uleb128 0x13
+ 680 005c 00       		.byte	0
+ 681 005d 03       		.uleb128 0x3
+ 682 005e 0E       		.uleb128 0xe
+ 683 005f 3C       		.uleb128 0x3c
+ 684 0060 19       		.uleb128 0x19
+ 685 0061 00       		.byte	0
+ 686 0062 00       		.byte	0
+ 687 0063 0A       		.uleb128 0xa
+ 688 0064 2E       		.uleb128 0x2e
+ 689 0065 01       		.byte	0x1
+ 690 0066 03       		.uleb128 0x3
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 15
+
+
+ 691 0067 0E       		.uleb128 0xe
+ 692 0068 3A       		.uleb128 0x3a
+ 693 0069 0B       		.uleb128 0xb
+ 694 006a 3B       		.uleb128 0x3b
+ 695 006b 0B       		.uleb128 0xb
+ 696 006c 27       		.uleb128 0x27
+ 697 006d 19       		.uleb128 0x19
+ 698 006e 11       		.uleb128 0x11
+ 699 006f 01       		.uleb128 0x1
+ 700 0070 12       		.uleb128 0x12
+ 701 0071 06       		.uleb128 0x6
+ 702 0072 40       		.uleb128 0x40
+ 703 0073 18       		.uleb128 0x18
+ 704 0074 9742     		.uleb128 0x2117
+ 705 0076 19       		.uleb128 0x19
+ 706 0077 01       		.uleb128 0x1
+ 707 0078 13       		.uleb128 0x13
+ 708 0079 00       		.byte	0
+ 709 007a 00       		.byte	0
+ 710 007b 0B       		.uleb128 0xb
+ 711 007c 2E       		.uleb128 0x2e
+ 712 007d 00       		.byte	0
+ 713 007e 3F       		.uleb128 0x3f
+ 714 007f 19       		.uleb128 0x19
+ 715 0080 03       		.uleb128 0x3
+ 716 0081 0E       		.uleb128 0xe
+ 717 0082 3A       		.uleb128 0x3a
+ 718 0083 0B       		.uleb128 0xb
+ 719 0084 3B       		.uleb128 0x3b
+ 720 0085 0B       		.uleb128 0xb
+ 721 0086 27       		.uleb128 0x27
+ 722 0087 19       		.uleb128 0x19
+ 723 0088 3C       		.uleb128 0x3c
+ 724 0089 19       		.uleb128 0x19
+ 725 008a 00       		.byte	0
+ 726 008b 00       		.byte	0
+ 727 008c 0C       		.uleb128 0xc
+ 728 008d 34       		.uleb128 0x34
+ 729 008e 00       		.byte	0
+ 730 008f 03       		.uleb128 0x3
+ 731 0090 0E       		.uleb128 0xe
+ 732 0091 3A       		.uleb128 0x3a
+ 733 0092 0B       		.uleb128 0xb
+ 734 0093 3B       		.uleb128 0x3b
+ 735 0094 0B       		.uleb128 0xb
+ 736 0095 49       		.uleb128 0x49
+ 737 0096 13       		.uleb128 0x13
+ 738 0097 3F       		.uleb128 0x3f
+ 739 0098 19       		.uleb128 0x19
+ 740 0099 3C       		.uleb128 0x3c
+ 741 009a 19       		.uleb128 0x19
+ 742 009b 00       		.byte	0
+ 743 009c 00       		.byte	0
+ 744 009d 0D       		.uleb128 0xd
+ 745 009e 01       		.uleb128 0x1
+ 746 009f 01       		.byte	0x1
+ 747 00a0 49       		.uleb128 0x49
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 16
+
+
+ 748 00a1 13       		.uleb128 0x13
+ 749 00a2 01       		.uleb128 0x1
+ 750 00a3 13       		.uleb128 0x13
+ 751 00a4 00       		.byte	0
+ 752 00a5 00       		.byte	0
+ 753 00a6 0E       		.uleb128 0xe
+ 754 00a7 21       		.uleb128 0x21
+ 755 00a8 00       		.byte	0
+ 756 00a9 00       		.byte	0
+ 757 00aa 00       		.byte	0
+ 758 00ab 0F       		.uleb128 0xf
+ 759 00ac 2E       		.uleb128 0x2e
+ 760 00ad 01       		.byte	0x1
+ 761 00ae 3F       		.uleb128 0x3f
+ 762 00af 19       		.uleb128 0x19
+ 763 00b0 03       		.uleb128 0x3
+ 764 00b1 0E       		.uleb128 0xe
+ 765 00b2 3A       		.uleb128 0x3a
+ 766 00b3 0B       		.uleb128 0xb
+ 767 00b4 3B       		.uleb128 0x3b
+ 768 00b5 0B       		.uleb128 0xb
+ 769 00b6 27       		.uleb128 0x27
+ 770 00b7 19       		.uleb128 0x19
+ 771 00b8 8701     		.uleb128 0x87
+ 772 00ba 19       		.uleb128 0x19
+ 773 00bb 11       		.uleb128 0x11
+ 774 00bc 01       		.uleb128 0x1
+ 775 00bd 12       		.uleb128 0x12
+ 776 00be 06       		.uleb128 0x6
+ 777 00bf 40       		.uleb128 0x40
+ 778 00c0 18       		.uleb128 0x18
+ 779 00c1 9742     		.uleb128 0x2117
+ 780 00c3 19       		.uleb128 0x19
+ 781 00c4 01       		.uleb128 0x1
+ 782 00c5 13       		.uleb128 0x13
+ 783 00c6 00       		.byte	0
+ 784 00c7 00       		.byte	0
+ 785 00c8 10       		.uleb128 0x10
+ 786 00c9 05       		.uleb128 0x5
+ 787 00ca 00       		.byte	0
+ 788 00cb 03       		.uleb128 0x3
+ 789 00cc 08       		.uleb128 0x8
+ 790 00cd 3A       		.uleb128 0x3a
+ 791 00ce 0B       		.uleb128 0xb
+ 792 00cf 3B       		.uleb128 0x3b
+ 793 00d0 0B       		.uleb128 0xb
+ 794 00d1 49       		.uleb128 0x49
+ 795 00d2 13       		.uleb128 0x13
+ 796 00d3 02       		.uleb128 0x2
+ 797 00d4 17       		.uleb128 0x17
+ 798 00d5 00       		.byte	0
+ 799 00d6 00       		.byte	0
+ 800 00d7 11       		.uleb128 0x11
+ 801 00d8 898201   		.uleb128 0x4109
+ 802 00db 01       		.byte	0x1
+ 803 00dc 11       		.uleb128 0x11
+ 804 00dd 01       		.uleb128 0x1
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 17
+
+
+ 805 00de 31       		.uleb128 0x31
+ 806 00df 13       		.uleb128 0x13
+ 807 00e0 01       		.uleb128 0x1
+ 808 00e1 13       		.uleb128 0x13
+ 809 00e2 00       		.byte	0
+ 810 00e3 00       		.byte	0
+ 811 00e4 12       		.uleb128 0x12
+ 812 00e5 8A8201   		.uleb128 0x410a
+ 813 00e8 00       		.byte	0
+ 814 00e9 02       		.uleb128 0x2
+ 815 00ea 18       		.uleb128 0x18
+ 816 00eb 9142     		.uleb128 0x2111
+ 817 00ed 18       		.uleb128 0x18
+ 818 00ee 00       		.byte	0
+ 819 00ef 00       		.byte	0
+ 820 00f0 13       		.uleb128 0x13
+ 821 00f1 898201   		.uleb128 0x4109
+ 822 00f4 00       		.byte	0
+ 823 00f5 11       		.uleb128 0x11
+ 824 00f6 01       		.uleb128 0x1
+ 825 00f7 31       		.uleb128 0x31
+ 826 00f8 13       		.uleb128 0x13
+ 827 00f9 00       		.byte	0
+ 828 00fa 00       		.byte	0
+ 829 00fb 14       		.uleb128 0x14
+ 830 00fc 2E       		.uleb128 0x2e
+ 831 00fd 01       		.byte	0x1
+ 832 00fe 3F       		.uleb128 0x3f
+ 833 00ff 19       		.uleb128 0x19
+ 834 0100 03       		.uleb128 0x3
+ 835 0101 0E       		.uleb128 0xe
+ 836 0102 3A       		.uleb128 0x3a
+ 837 0103 0B       		.uleb128 0xb
+ 838 0104 3B       		.uleb128 0x3b
+ 839 0105 0B       		.uleb128 0xb
+ 840 0106 27       		.uleb128 0x27
+ 841 0107 19       		.uleb128 0x19
+ 842 0108 49       		.uleb128 0x49
+ 843 0109 13       		.uleb128 0x13
+ 844 010a 8701     		.uleb128 0x87
+ 845 010c 19       		.uleb128 0x19
+ 846 010d 11       		.uleb128 0x11
+ 847 010e 01       		.uleb128 0x1
+ 848 010f 12       		.uleb128 0x12
+ 849 0110 06       		.uleb128 0x6
+ 850 0111 40       		.uleb128 0x40
+ 851 0112 18       		.uleb128 0x18
+ 852 0113 9742     		.uleb128 0x2117
+ 853 0115 19       		.uleb128 0x19
+ 854 0116 01       		.uleb128 0x1
+ 855 0117 13       		.uleb128 0x13
+ 856 0118 00       		.byte	0
+ 857 0119 00       		.byte	0
+ 858 011a 15       		.uleb128 0x15
+ 859 011b 34       		.uleb128 0x34
+ 860 011c 00       		.byte	0
+ 861 011d 03       		.uleb128 0x3
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 18
+
+
+ 862 011e 0E       		.uleb128 0xe
+ 863 011f 3A       		.uleb128 0x3a
+ 864 0120 0B       		.uleb128 0xb
+ 865 0121 3B       		.uleb128 0x3b
+ 866 0122 05       		.uleb128 0x5
+ 867 0123 49       		.uleb128 0x49
+ 868 0124 13       		.uleb128 0x13
+ 869 0125 3F       		.uleb128 0x3f
+ 870 0126 19       		.uleb128 0x19
+ 871 0127 3C       		.uleb128 0x3c
+ 872 0128 19       		.uleb128 0x19
+ 873 0129 00       		.byte	0
+ 874 012a 00       		.byte	0
+ 875 012b 16       		.uleb128 0x16
+ 876 012c 35       		.uleb128 0x35
+ 877 012d 00       		.byte	0
+ 878 012e 49       		.uleb128 0x49
+ 879 012f 13       		.uleb128 0x13
+ 880 0130 00       		.byte	0
+ 881 0131 00       		.byte	0
+ 882 0132 17       		.uleb128 0x17
+ 883 0133 34       		.uleb128 0x34
+ 884 0134 00       		.byte	0
+ 885 0135 03       		.uleb128 0x3
+ 886 0136 0E       		.uleb128 0xe
+ 887 0137 3A       		.uleb128 0x3a
+ 888 0138 0B       		.uleb128 0xb
+ 889 0139 3B       		.uleb128 0x3b
+ 890 013a 0B       		.uleb128 0xb
+ 891 013b 49       		.uleb128 0x49
+ 892 013c 13       		.uleb128 0x13
+ 893 013d 3F       		.uleb128 0x3f
+ 894 013e 19       		.uleb128 0x19
+ 895 013f 02       		.uleb128 0x2
+ 896 0140 18       		.uleb128 0x18
+ 897 0141 00       		.byte	0
+ 898 0142 00       		.byte	0
+ 899 0143 18       		.uleb128 0x18
+ 900 0144 2E       		.uleb128 0x2e
+ 901 0145 00       		.byte	0
+ 902 0146 3F       		.uleb128 0x3f
+ 903 0147 19       		.uleb128 0x19
+ 904 0148 3C       		.uleb128 0x3c
+ 905 0149 19       		.uleb128 0x19
+ 906 014a 6E       		.uleb128 0x6e
+ 907 014b 0E       		.uleb128 0xe
+ 908 014c 03       		.uleb128 0x3
+ 909 014d 0E       		.uleb128 0xe
+ 910 014e 3A       		.uleb128 0x3a
+ 911 014f 0B       		.uleb128 0xb
+ 912 0150 3B       		.uleb128 0x3b
+ 913 0151 05       		.uleb128 0x5
+ 914 0152 00       		.byte	0
+ 915 0153 00       		.byte	0
+ 916 0154 19       		.uleb128 0x19
+ 917 0155 2E       		.uleb128 0x2e
+ 918 0156 00       		.byte	0
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 19
+
+
+ 919 0157 3F       		.uleb128 0x3f
+ 920 0158 19       		.uleb128 0x19
+ 921 0159 3C       		.uleb128 0x3c
+ 922 015a 19       		.uleb128 0x19
+ 923 015b 6E       		.uleb128 0x6e
+ 924 015c 0E       		.uleb128 0xe
+ 925 015d 03       		.uleb128 0x3
+ 926 015e 0E       		.uleb128 0xe
+ 927 015f 3A       		.uleb128 0x3a
+ 928 0160 0B       		.uleb128 0xb
+ 929 0161 3B       		.uleb128 0x3b
+ 930 0162 0B       		.uleb128 0xb
+ 931 0163 00       		.byte	0
+ 932 0164 00       		.byte	0
+ 933 0165 00       		.byte	0
+ 934              		.section	.debug_loc,"",%progbits
+ 935              	.Ldebug_loc0:
+ 936              	.LLST0:
+ 937 0000 00000000 		.4byte	.LVL0
+ 938 0004 02000000 		.4byte	.LVL1
+ 939 0008 0100     		.2byte	0x1
+ 940 000a 50       		.byte	0x50
+ 941 000b 02000000 		.4byte	.LVL1
+ 942 000f 2C000000 		.4byte	.LFE70
+ 943 0013 0400     		.2byte	0x4
+ 944 0015 F3       		.byte	0xf3
+ 945 0016 01       		.uleb128 0x1
+ 946 0017 50       		.byte	0x50
+ 947 0018 9F       		.byte	0x9f
+ 948 0019 00000000 		.4byte	0
+ 949 001d 00000000 		.4byte	0
+ 950              	.LLST1:
+ 951 0021 00000000 		.4byte	.LVL5
+ 952 0025 02000000 		.4byte	.LVL6
+ 953 0029 0100     		.2byte	0x1
+ 954 002b 50       		.byte	0x50
+ 955 002c 02000000 		.4byte	.LVL6
+ 956 0030 2C000000 		.4byte	.LFE71
+ 957 0034 0400     		.2byte	0x4
+ 958 0036 F3       		.byte	0xf3
+ 959 0037 01       		.uleb128 0x1
+ 960 0038 50       		.byte	0x50
+ 961 0039 9F       		.byte	0x9f
+ 962 003a 00000000 		.4byte	0
+ 963 003e 00000000 		.4byte	0
+ 964              		.section	.debug_aranges,"",%progbits
+ 965 0000 34000000 		.4byte	0x34
+ 966 0004 0200     		.2byte	0x2
+ 967 0006 00000000 		.4byte	.Ldebug_info0
+ 968 000a 04       		.byte	0x4
+ 969 000b 00       		.byte	0
+ 970 000c 0000     		.2byte	0
+ 971 000e 0000     		.2byte	0
+ 972 0010 00000000 		.4byte	.LFB69
+ 973 0014 20000000 		.4byte	.LFE69-.LFB69
+ 974 0018 00000000 		.4byte	.LFB70
+ 975 001c 2C000000 		.4byte	.LFE70-.LFB70
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 20
+
+
+ 976 0020 00000000 		.4byte	.LFB71
+ 977 0024 2C000000 		.4byte	.LFE71-.LFB71
+ 978 0028 00000000 		.4byte	.LFB68
+ 979 002c 4C000000 		.4byte	.LFE68-.LFB68
+ 980 0030 00000000 		.4byte	0
+ 981 0034 00000000 		.4byte	0
+ 982              		.section	.debug_ranges,"",%progbits
+ 983              	.Ldebug_ranges0:
+ 984 0000 00000000 		.4byte	.LFB69
+ 985 0004 20000000 		.4byte	.LFE69
+ 986 0008 00000000 		.4byte	.LFB70
+ 987 000c 2C000000 		.4byte	.LFE70
+ 988 0010 00000000 		.4byte	.LFB71
+ 989 0014 2C000000 		.4byte	.LFE71
+ 990 0018 00000000 		.4byte	.LFB68
+ 991 001c 4C000000 		.4byte	.LFE68
+ 992 0020 00000000 		.4byte	0
+ 993 0024 00000000 		.4byte	0
+ 994              		.section	.debug_line,"",%progbits
+ 995              	.Ldebug_line0:
+ 996 0000 B4010000 		.section	.debug_str,"MS",%progbits,1
+ 996      02005501 
+ 996      00000201 
+ 996      FB0E0D00 
+ 996      01010101 
+ 997              	.LASF28:
+ 998 0000 4C454431 		.ascii	"LED1_Write\000"
+ 998      5F577269 
+ 998      746500
+ 999              	.LASF23:
+ 1000 000b 43795261 		.ascii	"CyRamVectors\000"
+ 1000      6D566563 
+ 1000      746F7273 
+ 1000      00
+ 1001              	.LASF9:
+ 1002 0018 5F5F696E 		.ascii	"__int32_t\000"
+ 1002      7433325F 
+ 1002      7400
+ 1003              	.LASF27:
+ 1004 0022 4C454431 		.ascii	"LED1_Read\000"
+ 1004      5F526561 
+ 1004      6400
+ 1005              	.LASF32:
+ 1006 002c 76546173 		.ascii	"vTaskStartScheduler\000"
+ 1006      6B537461 
+ 1006      72745363 
+ 1006      68656475 
+ 1006      6C657200 
+ 1007              	.LASF18:
+ 1008 0040 78506F72 		.ascii	"xPortPendSVHandler\000"
+ 1008      7450656E 
+ 1008      64535648 
+ 1008      616E646C 
+ 1008      657200
+ 1009              	.LASF11:
+ 1010 0053 666C6F61 		.ascii	"float\000"
+ 1010      7400
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 21
+
+
+ 1011              	.LASF1:
+ 1012 0059 756E7369 		.ascii	"unsigned char\000"
+ 1012      676E6564 
+ 1012      20636861 
+ 1012      7200
+ 1013              	.LASF33:
+ 1014 0067 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1014      43313120 
+ 1014      352E342E 
+ 1014      31203230 
+ 1014      31363036 
+ 1015 009a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1015      20726576 
+ 1015      6973696F 
+ 1015      6E203233 
+ 1015      37373135 
+ 1016 00cd 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1016      66756E63 
+ 1016      74696F6E 
+ 1016      2D736563 
+ 1016      74696F6E 
+ 1017              	.LASF5:
+ 1018 00f5 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1018      20756E73 
+ 1018      69676E65 
+ 1018      6420696E 
+ 1018      7400
+ 1019              	.LASF3:
+ 1020 0107 73686F72 		.ascii	"short unsigned int\000"
+ 1020      7420756E 
+ 1020      7369676E 
+ 1020      65642069 
+ 1020      6E7400
+ 1021              	.LASF35:
+ 1022 011a 443A5C4E 		.ascii	"D:\\Notes 202324\\ELECH410\\Labs\\Lab3\\ex1_blinky\\"
+ 1022      6F746573 
+ 1022      20323032 
+ 1022      3332345C 
+ 1022      454C4543 
+ 1023 0148 626C696E 		.ascii	"blinky.cydsn\000"
+ 1023      6B792E63 
+ 1023      7964736E 
+ 1023      00
+ 1024              	.LASF22:
+ 1025 0155 626C696E 		.ascii	"blinkyTask2\000"
+ 1025      6B795461 
+ 1025      736B3200 
+ 1026              	.LASF24:
+ 1027 0161 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1027      52784275 
+ 1027      66666572 
+ 1027      00
+ 1028              	.LASF12:
+ 1029 016e 646F7562 		.ascii	"double\000"
+ 1029      6C6500
+ 1030              	.LASF37:
+ 1031 0175 66726565 		.ascii	"freeRTOSInit\000"
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 22
+
+
+ 1031      52544F53 
+ 1031      496E6974 
+ 1031      00
+ 1032              	.LASF38:
+ 1033 0182 6D61696E 		.ascii	"main\000"
+ 1033      00
+ 1034              	.LASF36:
+ 1035 0187 74736B54 		.ascii	"tskTaskControlBlock\000"
+ 1035      61736B43 
+ 1035      6F6E7472 
+ 1035      6F6C426C 
+ 1035      6F636B00 
+ 1036              	.LASF19:
+ 1037 019b 78506F72 		.ascii	"xPortSysTickHandler\000"
+ 1037      74537973 
+ 1037      5469636B 
+ 1037      48616E64 
+ 1037      6C657200 
+ 1038              	.LASF8:
+ 1039 01af 756E7369 		.ascii	"unsigned int\000"
+ 1039      676E6564 
+ 1039      20696E74 
+ 1039      00
+ 1040              	.LASF7:
+ 1041 01bc 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1041      206C6F6E 
+ 1041      6720756E 
+ 1041      7369676E 
+ 1041      65642069 
+ 1042              	.LASF25:
+ 1043 01d3 626C696E 		.ascii	"blinkyHandler\000"
+ 1043      6B794861 
+ 1043      6E646C65 
+ 1043      7200
+ 1044              	.LASF29:
+ 1045 01e1 4C454432 		.ascii	"LED2_Read\000"
+ 1045      5F526561 
+ 1045      6400
+ 1046              	.LASF14:
+ 1047 01eb 63796973 		.ascii	"cyisraddress\000"
+ 1047      72616464 
+ 1047      72657373 
+ 1047      00
+ 1048              	.LASF10:
+ 1049 01f8 696E7433 		.ascii	"int32_t\000"
+ 1049      325F7400 
+ 1050              	.LASF15:
+ 1051 0200 73697A65 		.ascii	"sizetype\000"
+ 1051      74797065 
+ 1051      00
+ 1052              	.LASF6:
+ 1053 0209 6C6F6E67 		.ascii	"long long int\000"
+ 1053      206C6F6E 
+ 1053      6720696E 
+ 1053      7400
+ 1054              	.LASF34:
+ 1055 0217 6D61696E 		.ascii	"main.c\000"
+ARM GAS  C:\Users\nicol\AppData\Local\Temp\ccYYDSph.s 			page 23
+
+
+ 1055      2E6300
+ 1056              	.LASF13:
+ 1057 021e 63686172 		.ascii	"char\000"
+ 1057      00
+ 1058              	.LASF20:
+ 1059 0223 76506F72 		.ascii	"vPortSVCHandler\000"
+ 1059      74535643 
+ 1059      48616E64 
+ 1059      6C657200 
+ 1060              	.LASF30:
+ 1061 0233 4C454432 		.ascii	"LED2_Write\000"
+ 1061      5F577269 
+ 1061      746500
+ 1062              	.LASF21:
+ 1063 023e 626C696E 		.ascii	"blinkyTask\000"
+ 1063      6B795461 
+ 1063      736B00
+ 1064              	.LASF2:
+ 1065 0249 73686F72 		.ascii	"short int\000"
+ 1065      7420696E 
+ 1065      7400
+ 1066              	.LASF17:
+ 1067 0253 5461736B 		.ascii	"TaskHandle_t\000"
+ 1067      48616E64 
+ 1067      6C655F74 
+ 1067      00
+ 1068              	.LASF4:
+ 1069 0260 6C6F6E67 		.ascii	"long int\000"
+ 1069      20696E74 
+ 1069      00
+ 1070              	.LASF26:
+ 1071 0269 76546173 		.ascii	"vTaskDelay\000"
+ 1071      6B44656C 
+ 1071      617900
+ 1072              	.LASF16:
+ 1073 0274 6C6F6E67 		.ascii	"long double\000"
+ 1073      20646F75 
+ 1073      626C6500 
+ 1074              	.LASF0:
+ 1075 0280 7369676E 		.ascii	"signed char\000"
+ 1075      65642063 
+ 1075      68617200 
+ 1076              	.LASF31:
+ 1077 028c 78546173 		.ascii	"xTaskCreate\000"
+ 1077      6B437265 
+ 1077      61746500 
+ 1078              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

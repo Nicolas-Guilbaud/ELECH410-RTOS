@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blockRegMap version="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://cypress.com/xsd/cyblockregmap cyblockregmap.xsd" xmlns="http://cypress.com/xsd/cyblockregmap">
+  <block name="GND_6" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="D_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="LED3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="D_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_7" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="D_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_5" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_5" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_6" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="LED2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_7" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GPIOJ13" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GPIOJ12" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GPIOJ14" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Em_EEPROM_Dynamic" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="cy_boot" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="D_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_8" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GPIOJ11" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="LED4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Vdd_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="LED1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Vdd" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW_1" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Vdd_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_4" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="Vdd_2" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="SW_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="GND_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+  <block name="R_3" BASE="0x0" SIZE="0x0" desc="" visible="true" hidden="false" />
+</blockRegMap>
