@@ -59,6 +59,7 @@ void select_task(uint8 nber){
     switch(nber){
         case 0: 
             adc_task();
+            led_task();
             break;
         case 1:
             lcd_task();
@@ -108,12 +109,46 @@ void adc_task(){
 
 uint8 led_nber = 1;
 
+void led_selector(uint8 led,uint8 value){
+    switch(led){
+        case 1:
+        WRITE(LED1,value);
+        break;
+        case 2:
+        WRITE(LED2,value);
+        break;
+        case 3:
+        WRITE(LED3,value);
+        break;
+        case 4:
+        WRITE(LED4,value);
+        break;
+        default:
+        break;
+    }
+}
+
+uint16 led_count = 0;
+
 void led_task(){
+    
+    led_count++;
+    
+    uint16 count = (adc_result*100)/65536;
+    
+    if(led_count < count)
+        return;
+    
+    ANALYZE(GPIOJ14);
+    led_count = 0;
+    
+    led_selector(led_nber,0);
     led_nber++;
+    
     if(led_nber > 4)
         led_nber = 1;
     
-    
+    led_selector(led_nber,1);
     
 }
 
