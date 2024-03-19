@@ -82,6 +82,7 @@ int main(void)
     
     for(;;)
     {
+        WRITE(GPIOJ12,1);
         /* Place your application code here. */
         for(uint8 i = 0; i < 3; i++){
             
@@ -92,12 +93,19 @@ int main(void)
             
         }
         
+        if(SW1_ClearInterrupt())
+            event_sw1_task();
+        
+        WRITE(GPIOJ12,0);
+        
+        CyPmAltAct(PM_SLEEP_TIME_NONE, PM_ALT_ACT_SRC_INTERRUPT);
+        
     }
 }
 
 void adc_task(){
     
-    ANALYZE(GPIOJ12);
+    
     
     if(ADC_IsEndConversion(ADC_RETURN_STATUS) == 0){
         return;
@@ -181,7 +189,15 @@ void lcd_task(){
     
 }
 
+uint8 sw_count = 0;
+
 void event_sw1_task(){
+    
+    sw_count++;
+    
+    LCD_ClearDisplay();
+    LCD_Position(1,5);
+    LCD_PrintDecUint16(sw_count);
 }
 
 
