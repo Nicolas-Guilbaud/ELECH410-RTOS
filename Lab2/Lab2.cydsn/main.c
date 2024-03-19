@@ -11,7 +11,12 @@
 */
 #include "project.h"
 
-// Task prototypes
+#define READ(name) name##_##Read()
+#define WRITE(name,v) name##_##Write(v)
+#define ANALYZE(name) WRITE(name,(READ(name)+1)%2);
+
+
+
 void        adc_task();
 void        lcd_task(); 
 void        led_task(); 
@@ -32,28 +37,19 @@ uint16 adc_result = 0;
 
 uint8 flags[] = {0,0,0};
 
-int c = 0;
-
 char8 msg[] = "Hello World !"; //size = 13
 uint8 lcd_shift = 0;
 
 CY_ISR(handler){
     
-    
-    
+    ANALYZE(GPIOJ11);
     
     counter = (counter+1) %6;
-    
     
     for(uint8 i = 0; i < 3; i++){
         uint8 value = scheduler[counter][i];
         flags[value-1] = 1;
     }
-    
-    if(c) c--;
-    else c++;
-    
-    GPIOJ12_Write(c);
     
     
     Timer_ReadStatusRegister();
@@ -61,9 +57,11 @@ CY_ISR(handler){
 
 void select_task(uint8 nber){
     switch(nber){
-        case 1: 
+        case 0: 
             adc_task();
             break;
+        case 1:
+            lcd_task();
         default: 
             break;
     }
@@ -78,7 +76,8 @@ int main(void)
     isr_timer_StartEx(handler);
     Timer_Start();
     LCD_Init();
-    ADC_Init();
+    ADC_Start();
+    ADC_StartConvert();
     
     for(;;)
     {
@@ -97,39 +96,53 @@ int main(void)
 
 void adc_task(){
     
-    if(adc_result == 0)
-        ADC_StartConvert();
+    ANALYZE(GPIOJ12);
     
-    if(ADC_IsEndConversion(ADC_RETURN_STATUS)){
-        
-        adc_result = ADC_GetResult16();
-        ADC_StartConvert();
+    if(ADC_IsEndConversion(ADC_RETURN_STATUS) == 0){
+        return;
     }
+    
+    adc_result = ADC_GetResult16();
+    ADC_StartConvert();
 }
 
+uint8 led_nber = 1;
+
 void led_task(){
+    led_nber++;
+    if(led_nber > 4)
+        led_nber = 1;
+    
+    
+    
 }
 
 uint8 lcd_counter = 0;
-    
+
 void lcd_task(){
+
     lcd_counter++;
     
-    if(lcd_counter != 10)
+    if(lcd_counter < 10)
         return;
+
+    ANALYZE(GPIOJ13)
     
     lcd_counter = 0;
-    lcd_shift ++;
+    lcd_shift = lcd_shift + 1 %13;
     
     LCD_ClearDisplay();
-    LCD_Position(lcd_shift/8,lcd_shift%8);
-    LCD_PrintString(msg);
-    char msg2[13];
     for(int i = 0; i < 13; i ++){
-        int index = (i+lcd_shift)%13;
-        msg2[i] = msg[i];
+        int index = (i+lcd_shift)%16;
+        
+        /*
+        if(i == 0 || index % 8 == 0)
+            LCD_Position(index/8,index%8);
+        */
+        if(index %8 == 0 || i == 0)
+            LCD_Position(index/8,index%8);
+        LCD_PutChar(msg[i]);
     }
-    
     
 }
 
